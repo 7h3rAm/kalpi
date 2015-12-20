@@ -2,7 +2,7 @@
 # encoding: utf-8
 # Chisel by David Zhou, github.com/dz
 # Fork and mod by Chyetanya Kunte, github.com/ckunte
-# Forked and more mods by Ankur Tyagi (@7h3rAm)
+# Fork and more mods by Ankur Tyagi (@7h3rAm)
 
 import os
 import re
@@ -13,6 +13,7 @@ import random
 import shutil
 import datetime
 import StringIO
+import collections
 from pprint import pprint
 
 try:
@@ -75,15 +76,11 @@ class utils:
 
 class kalpi:
   # todo
-  # 1. qr code
-  # 2. tags count
-  # 3. tags styling
-  # 4. move static templates to yaml
-  # 5. blog dashboard
+  # 1. blog dashboard
 
   def __init__(self):
     self.baseurl = "http://7h3ram.github.io/"
-    #self.baseurl = "/"
+    self.baseurl = "/"
     self.basepath = "/home/shiv/toolbox/7h3rAm.github.com"
     self.blogdir = "%s/" % (self.basepath)
     self.postsdir = "%s/_posts/" % (self.basepath)
@@ -201,9 +198,6 @@ class kalpi:
     with open(path, "wb") as file:
       file.write(data.encode("UTF-8"))
 
-  def do_static(self):
-    utils().copy_dir(self.staticdir, "%s/static/" % (self.blogdir))
-
   def gen_posts(self):
     for f in self.files:
       related_posts = list()
@@ -241,17 +235,68 @@ class kalpi:
 
   def gen_tags(self):
     self.tags = dict({})
+    maxtagcount = 0
     for file in self.files:
       for tag in file["tags"]:
         if tag not in self.tags.keys():
           self.tags[tag] = dict({
-            "count": 0,
+            "count": 1,
             "files": [file]
           })
         else:
           self.tags[tag]["count"] += 1
           self.tags[tag]["files"].append(file)
-    self.write_file("tags%s" % self.urlextension, self.env.get_template("tags.html").render(tags=self.tags, baseurl=self.baseurl, date=self.date))
+
+        if self.tags[tag]["count"] > maxtagcount:
+          maxtagcount = self.tags[tag]["count"]
+
+    colors = ["#FFB745", "#FF4500", "#E7552C", "#DC143C", "#800080", "#78243D", "#6A5ACD", "#514163", "#483D8B", "#008080"]
+    random.shuffle(colors)
+    random.shuffle(colors)
+    random.shuffle(colors)
+    tagstyle = dict({
+       10: "font-size: 1.0em; color:%s;" % (colors[0]),
+       20: "font-size: 1.5em; color:%s;" % (colors[1]),
+       30: "font-size: 2.0em; color:%s;" % (colors[2]),
+       40: "font-size: 2.5em; color:%s;" % (colors[3]),
+       50: "font-size: 3.0em; color:%s;" % (colors[4]),
+       60: "font-size: 3.5em; color:%s;" % (colors[5]),
+       70: "font-size: 4.0em; color:%s;" % (colors[6]),
+       80: "font-size: 4.5em; color:%s;" % (colors[7]),
+       90: "font-size: 5.0em; color:%s;" % (colors[8]),
+      100: "font-size: 5.5em; color:%s;" % (colors[9])
+    })
+
+    for tag in self.tags:
+      percent = (self.tags[tag]["count"]*100/maxtagcount)
+      if percent <= 10:
+        self.tags[tag]["tagstyle"] = tagstyle[10]
+      elif percent <= 20:
+        self.tags[tag]["tagstyle"] = tagstyle[20]
+      elif percent <= 30:
+        self.tags[tag]["tagstyle"] = tagstyle[30]
+      elif percent <= 40:
+        self.tags[tag]["tagstyle"] = tagstyle[40]
+      elif percent <= 50:
+        self.tags[tag]["tagstyle"] = tagstyle[50]
+      elif percent <= 60:
+        self.tags[tag]["tagstyle"] = tagstyle[60]
+      elif percent <= 70:
+        self.tags[tag]["tagstyle"] = tagstyle[70]
+      elif percent <= 80:
+        self.tags[tag]["tagstyle"] = tagstyle[80]
+      elif percent <= 90:
+        self.tags[tag]["tagstyle"] = tagstyle[90]
+      elif percent <= 100:
+        self.tags[tag]["tagstyle"] = tagstyle[100]
+
+    tags = self.tags.keys()
+    random.shuffle(tags)
+    tagsinfo = collections.OrderedDict()
+    for tag in tags:
+      tagsinfo[tag] = self.tags[tag]
+
+    self.write_file("tags%s" % self.urlextension, self.env.get_template("tags.html").render(tags=tagsinfo, baseurl=self.baseurl, date=self.date))
 
   def gen_code(self):
     self.write_file("code%s" % self.urlextension, self.env.get_template("code.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
@@ -278,7 +323,6 @@ class kalpi:
     self.env.filters["monthname"] = utils().get_month_name
     self.env.filters["joinlistand"] = utils().join_list_and
 
-    self.do_static()
     self.gen_posts()
     self.gen_index()
     self.gen_archive()
