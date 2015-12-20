@@ -12,10 +12,12 @@ import errno
 import random
 import shutil
 import datetime
+import StringIO
 from pprint import pprint
 
 try:
   import jinja2
+  import ho.pisa as pisa
   import markdown2 as markdown
 except ImportError as error:
   print "ImportError:", str(error)
@@ -76,13 +78,12 @@ class kalpi:
   # 1. qr code
   # 2. tags count
   # 3. tags styling
-  # 4. pandoc: md->tex->pdf
-  # 5. related posts (top 3 by tags)
-  # 6. move static templates to yaml
+  # 4. move static templates to yaml
+  # 5. blog dashboard
 
   def __init__(self):
     self.baseurl = "http://7h3ram.github.io/"
-    self.baseurl = "/"
+    #self.baseurl = "/"
     self.basepath = "/home/shiv/toolbox/7h3rAm.github.com"
     self.blogdir = "%s/" % (self.basepath)
     self.postsdir = "%s/_posts/" % (self.basepath)
@@ -93,6 +94,8 @@ class kalpi:
     self.relatedpostsstrategy = "tags_date"
     self.relatedpostsstrategy = "tags_random"
     self.templateopts = dict()
+    self.pdf = False
+    self.mdbaseurl = "https://raw.githubusercontent.com/7h3rAm/7h3rAm.github.io/master/_posts/"
 
     self.urlextension = ".html"
     if self.urlextension == ".html":
@@ -178,12 +181,15 @@ class kalpi:
 
     return files
 
-  def write_file(self, url, data):
+  def write_file(self, url, data, pdfdata=None):
     path = self.blogdir + url + self.pathextension
     dirs = os.path.dirname(path)
     if not os.path.isdir(dirs): os.makedirs(dirs)
     with open(path, "w") as file:
       file.write(data.encode("UTF-8"))
+
+    if self.pdf and pdfdata:
+      pisa.pisaDocument(StringIO.StringIO(pdfdata.encode("UTF-8")), open("%s%s" % (self.blogdir, url.replace(self.urlextension, ".pdf")), "wb"))
 
   def write_feed(self, url, data):
     path = self.blogdir + url
@@ -225,7 +231,7 @@ class kalpi:
           if tag not in related_posts:
             related_posts.append(tag)
 
-      self.write_file(f["url"], self.env.get_template("post.html").render(post=f, posts=self.files, related_posts=related_posts[:self.relatedpostscount], baseurl=self.baseurl, date=self.date))
+      self.write_file(url=f["url"], data=self.env.get_template("post.html").render(post=f, posts=self.files, mdbaseurl=self.mdbaseurl, related_posts=related_posts[:self.relatedpostscount], baseurl=self.baseurl, date=self.date), pdfdata=self.env.get_template("post_pdf.html").render(post=f, posts=self.files, mdbaseurl=self.mdbaseurl, related_posts=related_posts[:self.relatedpostscount], baseurl=self.baseurl, date=self.date))
 
   def gen_index(self):
     self.write_file("index%s" % self.urlextension, self.env.get_template("index.html").render(posts=self.files[:self.homepostscount], baseurl=self.baseurl, date=self.date))
