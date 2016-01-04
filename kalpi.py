@@ -77,6 +77,10 @@ class utils:
 class kalpi:
   # todo
   # 1. blog dashboard
+  # 2. code blocks, highlighting lines
+  # 3. code blocks, line numbers
+  # 4. mobile, block layout
+  # 5. whitespace cleanup for template generated files
 
   def __init__(self):
     self.baseurl = "http://7h3ram.github.io/"
@@ -251,9 +255,7 @@ class kalpi:
           maxtagcount = self.tags[tag]["count"]
 
     colors = ["#FFB745", "#FF4500", "#E7552C", "#DC143C", "#800080", "#78243D", "#6A5ACD", "#514163", "#483D8B", "#008080"]
-    random.shuffle(colors)
-    random.shuffle(colors)
-    random.shuffle(colors)
+    random.shuffle(colors);random.shuffle(colors);random.shuffle(colors)
     tagstyle = dict({
        10: "font-size: 1.0em; color:%s;" % (colors[0]),
        20: "font-size: 1.5em; color:%s;" % (colors[1]),
@@ -264,6 +266,7 @@ class kalpi:
        70: "font-size: 4.0em; color:%s;" % (colors[6]),
        80: "font-size: 4.5em; color:%s;" % (colors[7]),
        90: "font-size: 5.0em; color:%s;" % (colors[8]),
+       95: "font-size: 5.0em; color:%s;" % (colors[1]),
       100: "font-size: 5.5em; color:%s;" % (colors[9])
     })
 
@@ -291,7 +294,7 @@ class kalpi:
         self.tags[tag]["tagstyle"] = tagstyle[100]
 
     tags = self.tags.keys()
-    random.shuffle(tags)
+    random.shuffle(tags);random.shuffle(tags);random.shuffle(tags)
     tagsinfo = collections.OrderedDict()
     for tag in tags:
       tagsinfo[tag] = self.tags[tag]
