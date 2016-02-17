@@ -254,7 +254,8 @@ class kalpi:
         if self.tags[tag]["count"] > maxtagcount:
           maxtagcount = self.tags[tag]["count"]
 
-    colors = ["#FFB745", "#FF4500", "#E7552C", "#DC143C", "#800080", "#78243D", "#6A5ACD", "#514163", "#483D8B", "#008080"]
+    colors = ["#515151", "#747369", "#FFB745", "#FF4500", "#E7552C", "#DC143C", "#800080", "#78243D", "#6A5ACD", "#514163", "#483D8B", "#008080"]
+    colors = ["#f2777a", "#f99157", "#ffcc66", "#99cc99", "#66cccc", "#6699cc", "#cc99cc", "#d27b53"]
     random.shuffle(colors);random.shuffle(colors);random.shuffle(colors)
     tagstyle = dict({
        10: "font-size: 1.0em; color:%s;" % (colors[0]),
@@ -265,9 +266,9 @@ class kalpi:
        60: "font-size: 3.5em; color:%s;" % (colors[5]),
        70: "font-size: 4.0em; color:%s;" % (colors[6]),
        80: "font-size: 4.5em; color:%s;" % (colors[7]),
-       90: "font-size: 5.0em; color:%s;" % (colors[8]),
-       95: "font-size: 5.0em; color:%s;" % (colors[1]),
-      100: "font-size: 5.5em; color:%s;" % (colors[9])
+       90: "font-size: 5.0em; color:%s;" % (colors[3]),
+       95: "font-size: 5.0em; color:%s;" % (colors[4]),
+      100: "font-size: 5.5em; color:%s;" % (colors[5])
     })
 
     for tag in self.tags:
@@ -301,11 +302,8 @@ class kalpi:
 
     self.write_file("tags%s" % self.urlextension, self.env.get_template("tags.html").render(tags=tagsinfo, baseurl=self.baseurl, date=self.date))
 
-  def gen_code(self):
-    self.write_file("code%s" % self.urlextension, self.env.get_template("code.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
-
-  def gen_talks(self):
-    self.write_file("talks%s" % self.urlextension, self.env.get_template("talks.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
+  def gen_research(self):
+    self.write_file("research%s" % self.urlextension, self.env.get_template("research.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
 
   def gen_cv(self):
     self.write_file("cv%s" % self.urlextension, self.env.get_template("cv.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
@@ -330,9 +328,7 @@ class kalpi:
     self.gen_index()
     self.gen_archive()
     self.gen_tags()
-    self.gen_code()
-    self.gen_talks()
-    self.gen_cv()
+    self.gen_research()
     self.gen_about()
     self.gen_rss()
     self.gen_sitemap()
