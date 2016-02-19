@@ -113,6 +113,26 @@ class kalpi:
 
     self.format = lambda text: markdown.markdown(text, extras=["fenced-code-blocks","footnotes", "metadata", "smarty-pants", "tables"])
 
+  def sec_to_human(self, secs, sep=" and "):
+    units = dict({
+      7*24*3600: "week",
+      24*3600: "day",
+      3600: "hour",
+      60: "minute",
+      1: "second"
+    })
+    if secs <= 0: return "0 seconds"
+    s = list()
+    for divisor, name in sorted(units.iteritems(), reverse=True):
+      quot=int(secs/divisor)
+      if quot:
+        if abs(quot) > 1:
+          s.append("%s %ss" % (quot, name))
+        else:
+          s.append("%s %s" % (quot, name))
+        secs -= quot * divisor
+    return sep.join(s)
+
   def parse(self, lines):
     date, summary, tags, content = None, None, None, None
     for idx, line in enumerate(lines):
@@ -129,6 +149,28 @@ class kalpi:
         break
     return date, summary, tags, content
 
+  def stats(self, title, date, summary, tags, content, wps=4):
+    poststats = dict({
+      "title": title,
+      "words": 0,
+      "characters": 0,
+      "tags": 0,
+      "images": 0,
+      "readtime": None
+    })
+    for word in content.split(" "):
+      poststats["characters"] += len(word)
+
+    t = content.split(" ")
+    l = len(t)
+    poststats["readtime"] = l/wps
+    poststats["readtime"] += 1 if l%wps else 0
+    poststats["readtime"] = self.sec_to_human(poststats["readtime"])
+    poststats["words"] = len(content.split(" "))
+    poststats["tags"] = len(tags)
+    poststats["images"] = len(re.findall(r"<img src=", content))
+    return poststats
+
   def get_tree(self, source):
     files = list()
     self.tagsinfo = dict()
@@ -140,6 +182,7 @@ class kalpi:
         with open(path, "rU") as f:
           title = f.readline().decode("UTF-8")[:-1].strip("\n..")
           date, summary, tags, content = self.parse(f.readlines())
+          poststats = self.stats(title, date, summary, tags, content)
           year, month, day = date[:3]
           pretty_date = time.strftime(self.timeformat, date)
           epoch = time.mktime(date)
@@ -157,6 +200,8 @@ class kalpi:
             "month": month,
             "day": day,
             "tags": tags,
+            "words": poststats["words"],
+            "readtime": poststats["readtime"],
             "summary": summary,
             "filename": name})
 
@@ -253,7 +298,6 @@ class kalpi:
 
         if self.tags[tag]["count"] > maxtagcount:
           maxtagcount = self.tags[tag]["count"]
-
     colors = ["#515151", "#747369", "#FFB745", "#FF4500", "#E7552C", "#DC143C", "#800080", "#78243D", "#6A5ACD", "#514163", "#483D8B", "#008080"]
     colors = ["#f2777a", "#f99157", "#ffcc66", "#99cc99", "#66cccc", "#6699cc", "#cc99cc", "#d27b53"]
     random.shuffle(colors);random.shuffle(colors);random.shuffle(colors)
@@ -270,7 +314,6 @@ class kalpi:
        95: "font-size: 5.0em; color:%s;" % (colors[4]),
       100: "font-size: 5.5em; color:%s;" % (colors[5])
     })
-
     for tag in self.tags:
       percent = (self.tags[tag]["count"]*100/maxtagcount)
       if percent <= 10:
@@ -317,6 +360,9 @@ class kalpi:
   def gen_sitemap(self):
     self.write_sitemap("sitemap.xml", self.env.get_template("sitemap.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
 
+  def gen_dashboard(self):
+    self.write_file("dashboard%s" % self.urlextension, self.env.get_template("dashboard.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
+
   def create(self):
     self.date = utils().get_current_date()
     self.files = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=True)
@@ -332,6 +378,7 @@ class kalpi:
     self.gen_about()
     self.gen_rss()
     self.gen_sitemap()
+    self.gen_dashboard()
 
 
 if __name__ == "__main__":
