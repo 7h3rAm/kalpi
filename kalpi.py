@@ -149,7 +149,8 @@ class kalpi:
         break
     return date, summary, tags, content
 
-  def stats(self, title, date, summary, tags, content, wps=4):
+  def stats(self, title, date, summary, tags, content, wpm=240, avgwordlen=5.1):
+    wps = wpm/60
     poststats = dict({
       "title": title,
       "words": 0,
@@ -161,12 +162,17 @@ class kalpi:
     for word in content.split(" "):
       poststats["characters"] += len(word)
 
+    # count words by splitting on spaces
+    #poststats["words"] = len(content.split(" "))
+
+    # count words via avgwordlength
+    poststats["words"] = poststats["characters"]//avgwordlen
+
     t = content.split(" ")
     l = len(t)
-    poststats["readtime"] = l/wps
-    poststats["readtime"] += 1 if l%wps else 0
+    poststats["readtime"] = poststats["words"]/wps
+    poststats["readtime"] += 1 if poststats["words"]%wps else 0
     poststats["readtime"] = self.sec_to_human(poststats["readtime"])
-    poststats["words"] = len(content.split(" "))
     poststats["tags"] = len(tags)
     poststats["images"] = len(re.findall(r"<img src=", content))
     return poststats
