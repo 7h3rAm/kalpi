@@ -304,8 +304,7 @@ class kalpi:
 
         if self.tags[tag]["count"] > maxtagcount:
           maxtagcount = self.tags[tag]["count"]
-    colors = ["#515151", "#747369", "#FFB745", "#FF4500", "#E7552C", "#DC143C", "#800080", "#78243D", "#6A5ACD", "#514163", "#483D8B", "#008080"]
-    colors = ["#f2777a", "#f99157", "#ffcc66", "#99cc99", "#66cccc", "#6699cc", "#cc99cc", "#d27b53"]
+    colors = ["#008080", "#483D8B", "#514163", "#6699cc", "#66cccc", "#99cc99", "#DC143C", "#f2777a", "#FFB745"]
     random.shuffle(colors);random.shuffle(colors);random.shuffle(colors)
     tagstyle = dict({
        10: "font-size: 1.0em; color:%s;" % (colors[0]),
