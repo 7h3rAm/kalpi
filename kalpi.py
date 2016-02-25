@@ -306,42 +306,28 @@ class kalpi:
           maxtagcount = self.tags[tag]["count"]
     colors = ["#008080", "#483D8B", "#514163", "#6699cc", "#66cccc", "#99cc99", "#DC143C", "#f2777a", "#FFB745"]
     random.shuffle(colors);random.shuffle(colors);random.shuffle(colors)
-    tagstyle = dict({
-       10: "font-size: 1.0em; color:%s;" % (colors[0]),
-       20: "font-size: 1.5em; color:%s;" % (colors[1]),
-       30: "font-size: 2.0em; color:%s;" % (colors[2]),
-       40: "font-size: 2.5em; color:%s;" % (colors[3]),
-       50: "font-size: 3.0em; color:%s;" % (colors[4]),
-       60: "font-size: 3.5em; color:%s;" % (colors[5]),
-       70: "font-size: 4.0em; color:%s;" % (colors[6]),
-       80: "font-size: 4.5em; color:%s;" % (colors[7]),
-       90: "font-size: 5.0em; color:%s;" % (colors[3]),
-       95: "font-size: 5.0em; color:%s;" % (colors[4]),
-      100: "font-size: 5.5em; color:%s;" % (colors[5])
-    })
     for tag in self.tags:
       percent = (self.tags[tag]["count"]*100/maxtagcount)
       if percent <= 10:
-        self.tags[tag]["tagstyle"] = tagstyle[10]
+        self.tags[tag]["tagstyle"] = "font-size: 1.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[0])
       elif percent <= 20:
-        self.tags[tag]["tagstyle"] = tagstyle[20]
+        self.tags[tag]["tagstyle"] = "font-size: 1.5em; color:%s; padding:20px 5px 20px 5px;" % (colors[1])
       elif percent <= 30:
-        self.tags[tag]["tagstyle"] = tagstyle[30]
+        self.tags[tag]["tagstyle"] = "font-size: 2.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[2])
       elif percent <= 40:
-        self.tags[tag]["tagstyle"] = tagstyle[40]
+        self.tags[tag]["tagstyle"] = "font-size: 2.5em; color:%s; padding:20px 5px 20px 5px;" % (colors[3])
       elif percent <= 50:
-        self.tags[tag]["tagstyle"] = tagstyle[50]
+        self.tags[tag]["tagstyle"] = "font-size: 3.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[4])
       elif percent <= 60:
-        self.tags[tag]["tagstyle"] = tagstyle[60]
+        self.tags[tag]["tagstyle"] = "font-size: 3.5em; color:%s; padding:0px 5px 0px 5px;" % (colors[5])
       elif percent <= 70:
-        self.tags[tag]["tagstyle"] = tagstyle[70]
+        self.tags[tag]["tagstyle"] = "font-size: 4.0em; color:%s; padding:0px 5px 0px 5px;" % (colors[6])
       elif percent <= 80:
-        self.tags[tag]["tagstyle"] = tagstyle[80]
+        self.tags[tag]["tagstyle"] = "font-size: 4.5em; color:%s; padding:0px 5px 0px 5px;" % (colors[7])
       elif percent <= 90:
-        self.tags[tag]["tagstyle"] = tagstyle[90]
+        self.tags[tag]["tagstyle"] = "font-size: 5.0em; color:%s; padding:0px 5px 0px 5px;" % (colors[8])
       elif percent <= 100:
-        self.tags[tag]["tagstyle"] = tagstyle[100]
-
+        self.tags[tag]["tagstyle"] = "font-size: 5.5em; color:%s; padding:0px 5px 0px 5px;" % (colors[0])
     tags = self.tags.keys()
     random.shuffle(tags);random.shuffle(tags);random.shuffle(tags)
     tagsinfo = collections.OrderedDict()
