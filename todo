@@ -1,0 +1,11 @@
+
+stats
+  words
+  characters
+  links
+    local
+    remote
+  images
+  readtime
+  tags
+  chars,words,images,tags,posts,readtime/tag,post,month,year
