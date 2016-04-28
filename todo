@@ -1,11 +1,15 @@
 
-stats
-  words
-  characters
-  links
-    local
-    remote
-  images
-  readtime
-  tags
-  chars,words,images,tags,posts,readtime/tag,post,month,year
+Dashboard:
+  [DONE] words
+  [DONE] readtime
+  [DONE] tags
+  words,tags,posts,readtime/tag,post,month,year
+
+Github API Integration:
+  https://api.github.com/repos/7h3rAm/7h3rAm.github.io
+  [DONE] https://api.github.com/repos/7h3rAm/7h3rAm.github.io/commits
+  https://api.github.com/repos/7h3rAm/7h3rAm.github.io/branches
+  https://api.github.com/repos/7h3rAm/7h3rAm.github.io/releases
+  https://api.github.com/repos/7h3rAm/7h3rAm.github.io/contributors
+  https://api.github.com/repos/7h3rAm/7h3rAm.github.io/forks
+  https://api.github.com/repos/7h3rAm/7h3rAm.github.io/issues
