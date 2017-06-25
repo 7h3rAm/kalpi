@@ -13,3 +13,9 @@ Github API Integration:
   https://api.github.com/repos/7h3rAm/7h3rAm.github.io/contributors
   https://api.github.com/repos/7h3rAm/7h3rAm.github.io/forks
   https://api.github.com/repos/7h3rAm/7h3rAm.github.io/issues
+
+Onename API Integration:
+  appid: bfa5084834b1bab5ae3e7f03b9db5e2f
+  appsecret: 4eec4bde929fa1005a6b3923fab301d1c4da2d79cd98dba86c3391190501b322
+  https://api.onename.com/v1/users/ankurtyagi?app-id=bfa5084834b1bab5ae3e7f03b9db5e2f&app-secret=4eec4bde929fa1005a6b3923fab301d1c4da2d79cd98dba86c3391190501b322
+  https://api.onename.com/v1/users/ankurtyagi?app-id=demo-app-id&app-secret=demo-app-secret
