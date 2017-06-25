@@ -7,6 +7,7 @@
 import os
 import re
 import sys
+import json
 import time
 import errno
 import random
@@ -62,9 +63,15 @@ class utils:
     else:
       return None
 
+  def join_list(self, inlist, url="/tags.html#"):
+    outlist = []
+    for item in sorted(inlist):
+      outlist.append("<a href=%s%s>%s</a>" % (url, item, item))
+    return ", ".join(outlist)
+
   def join_list_and(self, inlist, url="/tags.html#"):
     outlist = []
-    for item in inlist:
+    for item in sorted(inlist):
       outlist.append("<a href=%s%s>%s</a>" % (url, item, item))
     set1 = ", ".join(outlist[:-2])
     set2 = " and ".join(outlist[-2:])
@@ -76,7 +83,7 @@ class utils:
 
 class kalpi:
   # todo
-  # 1. blog dashboard
+  # 1. blog stats
   # 2. code blocks, highlighting lines
   # 3. code blocks, line numbers
   # 4. mobile, block layout
@@ -84,8 +91,7 @@ class kalpi:
 
   def __init__(self):
     self.baseurl = "http://7h3ram.github.io/"
-    self.baseurl = "/"
-    self.basepath = "/home/shiv/toolbox/7h3rAm.github.io"
+    self.basepath = "/home/shiv/toolbox/7h3rAm.github.io/"
     self.blogdir = "%s/" % (self.basepath)
     self.postsdir = "%s/_posts/" % (self.basepath)
     self.templatedir = "%s/_templates/" % (self.basepath)
@@ -108,6 +114,9 @@ class kalpi:
     })
     self.chartdatafile = "%s/files/chart-data.js" % (self.staticdir)
 
+    with open("%s/_data/data.json" % (self.basepath)) as fo:
+      self.data = json.load(fo)
+
     self.urlextension = ".html"
     if self.urlextension == ".html":
       self.pathextension = ""
@@ -117,6 +126,7 @@ class kalpi:
       pass
 
     self.timeformat = "%B %-d, %Y"
+    self.timeformat = "%Y %b %d"
     self.stimeformat = "%b %d"
     self.rssdateformat = "%a, %d %b %Y %H:%M:%S %z"
     self.postdateformat = "%d/%b/%Y"
@@ -306,7 +316,7 @@ class kalpi:
       self.write_file(url=f["url"], data=self.env.get_template("post.html").render(post=f, posts=self.files, mdbaseurl=self.mdbaseurl, related_posts=related_posts[:self.relatedpostscount], baseurl=self.baseurl, date=self.date))
 
   def gen_index(self):
-    self.write_file("index%s" % self.urlextension, self.env.get_template("index.html").render(posts=self.files[:self.homepostscount], baseurl=self.baseurl, date=self.date))
+    self.write_file("index%s" % self.urlextension, self.env.get_template("index.html").render(posts=self.files[:self.homepostscount], baseurl=self.baseurl, data=self.data, date=self.date))
 
   def gen_archive(self):
     self.write_file("archive%s" % self.urlextension, self.env.get_template("archive.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
@@ -360,7 +370,10 @@ class kalpi:
     self.write_file("tags%s" % self.urlextension, self.env.get_template("tags.html").render(tags=tagsinfo, baseurl=self.baseurl, date=self.date))
 
   def gen_research(self):
-    self.write_file("research%s" % self.urlextension, self.env.get_template("research.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
+    self.write_file("research%s" % self.urlextension, self.env.get_template("research.html").render(posts=self.files, baseurl=self.baseurl, data=self.data, date=self.date))
+
+  def gen_cv(self):
+    self.write_file("cv%s" % self.urlextension, self.env.get_template("cv.html").render(posts=self.files, baseurl=self.baseurl, data=self.data, date=self.date))
 
   def gen_rss(self):
     self.write_feed("rss.xml", self.env.get_template("rss.html").render(posts=self.files[:self.homepostscount], baseurl=self.baseurl, date=self.date))
@@ -368,7 +381,7 @@ class kalpi:
   def gen_sitemap(self):
     self.write_sitemap("sitemap.xml", self.env.get_template("sitemap.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
 
-  def gen_dashboard(self):
+  def gen_stats(self):
     self.stats["count_posts"] = len(self.posts)
     self.stats["count_tags"] = len(self.tags)
     self.stats["count_words"] = int(self.stats["count_words"])
@@ -412,13 +425,27 @@ class kalpi:
     with open(self.chartdatafile, "w") as fo:
       fo.write(chartdata)
 
-    self.write_file("dashboard%s" % self.urlextension, self.env.get_template("dashboard.html").render(stats=self.stats, posts=self.files, baseurl=self.baseurl, date=self.date))
+    stats = dict()
+    stats["readtime_per_tag"] = self.stats["readtime_per_tag"]
+    stats["count_words"] = self.stats["count_words"]
+    stats["count_readtime"] = self.stats["count_readtime"]
+    stats["words_per_post"] = self.stats["words_per_post"]
+    stats["chart_data"] = self.stats["chart_data"]
+    stats["count_posts"] = self.stats["count_posts"]
+    stats["posts_per_tag"] = self.stats["posts_per_tag"]
+    stats["readtime_per_post"] = self.stats["readtime_per_post"]
+    stats["count_tags"] = self.stats["count_tags"]
+    stats["words_per_tag"] = self.stats["words_per_tag"]
+    self.write_file("stats%s" % self.urlextension, self.env.get_template("stats.html").render(stats=self.format("```json\n%s\n```" % (json.dumps(stats, indent=2, sort_keys=True))), posts=self.files, baseurl=self.baseurl, date=self.date))
 
   def create(self):
     self.date = utils().get_current_date()
     self.files = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=True)
     self.env = jinja2.Environment(loader=jinja2.FileSystemLoader(self.templatedir), extensions=["jinja2_markdown.MarkdownExtension"], **self.templateopts)
+    self.env.trim_blocks = True
+    self.env.lsrtip_blocks = True
     self.env.filters["monthname"] = utils().get_month_name
+    self.env.filters["joinlist"] = utils().join_list
     self.env.filters["joinlistand"] = utils().join_list_and
 
     self.gen_posts()
@@ -426,9 +453,10 @@ class kalpi:
     self.gen_archive()
     self.gen_tags()
     self.gen_research()
+    self.gen_cv()
     self.gen_rss()
     self.gen_sitemap()
-    self.gen_dashboard()
+    self.gen_stats()
 
 
 if __name__ == "__main__":
