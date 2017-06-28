@@ -101,6 +101,7 @@ class kalpi:
     self.relatedpostsstrategy = "tags_date"
     self.relatedpostsstrategy = "tags_random"
     self.templateopts = dict()
+    self.theme = random.choice(["bright"])
     self.pdf = False
     self.mdbaseurl = "https://raw.githubusercontent.io/7h3rAm/7h3rAm.github.io/master/_posts/"
     self.tags = dict()
@@ -313,13 +314,13 @@ class kalpi:
           if tag not in related_posts:
             related_posts.append(tag)
 
-      self.write_file(url=f["url"], data=self.env.get_template("post.html").render(post=f, posts=self.files, mdbaseurl=self.mdbaseurl, related_posts=related_posts[:self.relatedpostscount], baseurl=self.baseurl, date=self.date))
+      self.write_file(url=f["url"], data=self.env.get_template("post.html").render(post=f, posts=self.files, mdbaseurl=self.mdbaseurl, related_posts=related_posts[:self.relatedpostscount], baseurl=self.baseurl, theme=self.theme, date=self.date))
 
   def gen_index(self):
-    self.write_file("index%s" % self.urlextension, self.env.get_template("index.html").render(posts=self.files[:self.homepostscount], baseurl=self.baseurl, data=self.data, date=self.date))
+    self.write_file("index%s" % self.urlextension, self.env.get_template("index.html").render(posts=self.files[:self.homepostscount], baseurl=self.baseurl, data=self.data, theme=self.theme, date=self.date))
 
   def gen_archive(self):
-    self.write_file("archive%s" % self.urlextension, self.env.get_template("archive.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
+    self.write_file("archive%s" % self.urlextension, self.env.get_template("archive.html").render(posts=self.files, baseurl=self.baseurl, theme=self.theme, date=self.date))
 
   def gen_tags(self):
     maxtagcount = 0
@@ -367,19 +368,19 @@ class kalpi:
       tagsinfo[tag] = self.tags[tag]
 
     self.stats["tags"] = self.tags
-    self.write_file("tags%s" % self.urlextension, self.env.get_template("tags.html").render(tags=tagsinfo, baseurl=self.baseurl, date=self.date))
+    self.write_file("tags%s" % self.urlextension, self.env.get_template("tags.html").render(tags=tagsinfo, baseurl=self.baseurl, theme=self.theme, date=self.date))
 
   def gen_research(self):
-    self.write_file("research%s" % self.urlextension, self.env.get_template("research.html").render(posts=self.files, baseurl=self.baseurl, data=self.data, date=self.date))
+    self.write_file("research%s" % self.urlextension, self.env.get_template("research.html").render(posts=self.files, baseurl=self.baseurl, data=self.data, theme=self.theme, date=self.date))
 
   def gen_cv(self):
-    self.write_file("cv%s" % self.urlextension, self.env.get_template("cv.html").render(posts=self.files, baseurl=self.baseurl, data=self.data, date=self.date))
+    self.write_file("cv%s" % self.urlextension, self.env.get_template("cv.html").render(posts=self.files, baseurl=self.baseurl, data=self.data, theme=self.theme, date=self.date))
 
   def gen_rss(self):
-    self.write_feed("rss.xml", self.env.get_template("rss.html").render(posts=self.files[:self.homepostscount], baseurl=self.baseurl, date=self.date))
+    self.write_feed("rss.xml", self.env.get_template("rss.html").render(posts=self.files[:self.homepostscount], baseurl=self.baseurl, theme=self.theme, date=self.date))
 
   def gen_sitemap(self):
-    self.write_sitemap("sitemap.xml", self.env.get_template("sitemap.html").render(posts=self.files, baseurl=self.baseurl, date=self.date))
+    self.write_sitemap("sitemap.xml", self.env.get_template("sitemap.html").render(posts=self.files, baseurl=self.baseurl, theme=self.theme, date=self.date))
 
   def gen_stats(self):
     self.stats["count_posts"] = len(self.posts)
@@ -436,7 +437,7 @@ class kalpi:
     stats["readtime_per_post"] = self.stats["readtime_per_post"]
     stats["count_tags"] = self.stats["count_tags"]
     stats["words_per_tag"] = self.stats["words_per_tag"]
-    self.write_file("stats%s" % self.urlextension, self.env.get_template("stats.html").render(stats=self.format("```json\n%s\n```" % (json.dumps(stats, indent=2, sort_keys=True))), posts=self.files, baseurl=self.baseurl, date=self.date))
+    self.write_file("stats%s" % self.urlextension, self.env.get_template("stats.html").render(stats=self.format("```json\n%s\n```" % (json.dumps(stats, indent=2, sort_keys=True))), posts=self.files, baseurl=self.baseurl, theme=self.theme, date=self.date))
 
   def create(self):
     self.date = utils().get_current_date()
