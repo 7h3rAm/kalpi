@@ -219,7 +219,7 @@ class kalpi:
           date, summary, tags, content = self.parse(f.readlines())
 
           year, month, day = date[:3]
-          pretty_date = time.strftime(self.timeformat, date)
+          pretty_date = time.strftime(self.postdateformat, date)
           epoch = time.mktime(date)
           url = "/".join([str(year), os.path.splitext(name)[0] + self.urlextension])
 
