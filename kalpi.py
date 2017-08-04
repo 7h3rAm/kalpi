@@ -25,6 +25,8 @@ except ImportError as error:
   print "ImportError:", str(error)
   exit(1)
 
+import datadict
+
 
 class utils:
   def __init__(self):
@@ -455,6 +457,10 @@ class kalpi:
     self.env.filters["monthname"] = utils().get_month_name
     self.env.filters["joinlist"] = utils().join_list
     self.env.filters["joinlistand"] = utils().join_list_and
+
+    # update data.json
+    with open("%s/_data/data.json" % (self.basepath), "w") as fo:
+      json.dump(datadict.get(), fo, sort_keys=True, indent=2)
 
     self.gen_posts()
     self.gen_index()

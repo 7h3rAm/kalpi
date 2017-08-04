@@ -3,7 +3,7 @@
 
 import json
 
-data = {
+datadict = {
   "research": {
     "patents": {
       "2017": {
@@ -33,6 +33,17 @@ data = {
       }
     },
     "talks": [
+      {
+        "title": "Visual Network and File Forensics",
+        "description": "This presentation aims to demo the effectiveness of visual tooling for malware and file-format forensics. It will cover structural analysis and visualization of malware and network artifacts. Various techniques like entropy/n-gram visualization, using compression-ratio and theoretical minsize to identify file type and packed content will be shown. Along with this, a framework that helps automate these tasks will be presented. Attendees with an interest in network monitoring, signature writing, malware analysis and forensics will find this presentation to be useful.",
+        "events": [
+          {
+            "name": "DEF CON 25 Packet Hacking Village",
+            "url": "https://www.wallofsheep.com/pages/dc25#atyagi",
+            "pretty_date": "29/Jul/2017"
+          },
+        ]
+      },
       {
         "title": "Rudra: The Destroyer of Evil",
         "description": "Rudra aims to provide a developer-friendly framework for exhaustive analysis of (PCAP and PE) files. It provides features to scan and generate reports that include file's structural properties, entropy visualization, compression ratio, theoretical minsize, etc. These details, alongwith file-format specific analysis information, help an analyst to understand the type of data embedded in a file and quickly decide if it deserves further investigation. It supports scanning PE files and can perform API scans, anti{debug, vm, sandbox} detection, packer detection, authenticode verification, alongwith Yara, shellcode, and regex detection upon them.",
@@ -137,6 +148,6 @@ data = {
   "aboutme": "<img alt=\"Ankur Tyagi\" class=\"aboutimg\" src=\"/static/images/ankur-tyagi-3120x4160-small.jpg\"><p>Hi, I'm Ankur Tyagi and this is my blog where I document ideas and list updates on several topics of interest that span <a href=\"/tags.html\">security</a>, <a href=\"/tags.html#code\">programming</a> and <a href=\"/tags.html#writeups\">problem solving</a> in general. It is completely <a href=\"https://github.com/7h3rAm/7h3rAm.github.io\" target=\"_blank\">opensource</a> and created using a minimal static site generator called <a href=\"https://github.com/7h3rAm/kalpi/\" target=\"_blank\">Kalpi</a>.</p><p>I've completed my graduate studies with a formal background in Computer Science and Software Systems. I started my professional journey with Vulnerability Assessment as the primary work domain but in a few years moved to Intrusion Prevention which eventually became my expertise. In an attempt to further improve infosec domain understanding, I moved to my present profile where I work as a Malware Researcher and get exposure to a wide array of concepts and ideas. At present, malware analysis, file-format decoding and network traffic inspection are my primary areas of interest.</p><p>I use <strong>7h3rAm</strong> (<a href=\"https://en.wikipedia.org/wiki/International_Phonetic_Alphabet\" target=\"_blank\">IPA</a>: <i>θˈɛɹam</i>) as my handle and you can find me using it on most social platforms. You can also reach me via <a href=\"mailto:echo 2s6eln@vncad.bzn | tr [62cbvsadnzel] [37acghilmorA]\">mail</a>, <a href=\"http://in.linkedin.com/in/ankurstyagi\" target=\"_blank\">linkedin</i></a>, <a href=\"https://github.com/7h3rAm\" target=\"_blank\">github</i></a>, <a href=\"https://twitter.com/7h3rAm\" target=\"_blank\">twitter</i></a> or <a href=\"https://keybase.io/7h3ram\" target=\"_blank\">keybase</a>.</p>"
 }
 
-with open("/media/shiv/red_third/stoolbox/gdrive-bckup/toolbox/7h3rAm.github.io/_data/data.json", "w") as fo:
-  json.dump(data, fo, sort_keys=True, indent=2)
 
+def get():
+  return datadict
