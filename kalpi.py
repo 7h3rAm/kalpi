@@ -346,7 +346,13 @@ class kalpi:
 
         if self.tags[tag]["count"] > maxtagcount:
           maxtagcount = self.tags[tag]["count"]
-    colors = ["#008080", "#483D8B", "#514163", "#6699cc", "#66cccc", "#99cc99", "#DC143C", "#f2777a", "#FFB745"]
+    colors = ["#008080", "#483D8B", "#514163", "#6699CC", "#66CCCC",
+              "#99CC99", "#DC143C", "#F2777A", "#FFB745", "#4B0082",
+              "#3CB371", "#2E8B57", "#808000", "#20B2AA", "#008B8B",
+              "#4682B4", "#B0C4DE", "#87CEFA", "#87CEEB", "#1E90FF",
+              "#6495ED", "#000080", "#191970", "#BC8F8F",
+              "#C0C0C0", "#808080", "#696969", "#A9A9A9"
+            ]
     random.shuffle(colors);random.shuffle(colors);random.shuffle(colors)
     for tag in self.tags:
       percent = (self.tags[tag]["count"]*100/maxtagcount)
