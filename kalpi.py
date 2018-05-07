@@ -93,7 +93,7 @@ class kalpi:
 
   def __init__(self):
     self.baseurl = "http://7h3ram.github.io/"
-    self.basepath = "/media/shiv/red_third/stoolbox/gdrive-bckup/toolbox/7h3rAm.github.io/"
+    self.basepath = "/media/ankur/ubuntu500g/warehouse/projects/7h3rAm.github.io/"
     self.blogdir = "%s/" % (self.basepath)
     self.postsdir = "%s/_posts/" % (self.basepath)
     self.templatedir = "%s/_templates/" % (self.basepath)

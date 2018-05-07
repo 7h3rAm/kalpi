@@ -38,9 +38,15 @@ datadict = {
         "description": "This presentation aims to demo the effectiveness of visual tooling for malware and file-format forensics. It will cover structural analysis and visualization of malware and network artifacts. Various techniques like entropy/n-gram visualization, using compression-ratio and theoretical minsize to identify file type and packed content will be shown. Along with this, a framework that helps automate these tasks will be presented. Attendees with an interest in network monitoring, signature writing, malware analysis and forensics will find this presentation to be useful.",
         "events": [
           {
+            "name": "Virus Bulletin (VB2017)",
+            "url": "https://www.virusbulletin.com/conference/vb2017/abstracts/visual-malware-forensics",
+            "pretty_date": "Oct/2017",
+            "media": None
+          },
+          {
             "name": "DEF CON 25 Packet Hacking Village",
             "url": "https://www.wallofsheep.com/pages/dc25#atyagi",
-            "pretty_date": "29/Jul/2017",
+            "pretty_date": "Jul/2017",
             "media": [
               {
                 "name": "Help Net Security",
@@ -58,7 +64,7 @@ datadict = {
             "name": "DEF CON 24 Demo Labs",
             "url": "https://www.defcon.org/html/defcon-24/dc-24-demolabs.html#Tyagi",
             "pretty_date": "06/Aug/2016",
-            "media": None,
+            "media": None
           },
           {
             "name": "BlackHat USA 2016 Arsenal",
