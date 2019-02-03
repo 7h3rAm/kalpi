@@ -11,8 +11,8 @@ datadict = {
           "title": "Method and Apparatus for Intelligent Aggregation of Threat Behavior for the Detection of Malware",
           "description": "An attempt towards automated selection and grouping of aggregated threat behavior indicators depicting dominant malware characteristics.",
           "pretty_date": "Apr/2017",
-          "patent_id": None,
-          "patent_url": None
+          "patent_id": "US10104101B1",
+          "patent_url": "https://patents.google.com/patent/US10104101B1/"
         }
       },
       "2014": {
@@ -33,6 +33,36 @@ datadict = {
       }
     },
     "talks": [
+      {
+        "title": "Angad: A Malware Detection Framework using Multi-Dimensional Visualization",
+        "description": "Angad is a framework to automate classification of an unlabelled malware dataset using multi-dimensional modelling. The input dataset is analyzed to collect various attributes which are then arranged in a number of feature vectors. These vectors are then individually visualized, indexed and then queried for each new input file. Matching vectors are labelled as per their AV detection categories for now but this could be changed to a heuristics approach if needed. If dynamic behavior or network traffic details are available, vectors are also converted into activity graphs that depict evolution of activity with a predefined time scale. This results into an animation of malware/malware category's behavior traits and is also useful in identifying activity overlaps across the input dataset.",
+        "events": [
+          {
+            "name": "DEF CON 26 Demo Labs",
+            "url": "https://www.defcon.org/html/defcon-26/dc-26-demolabs.html#Angad",
+            "pretty_date": "Aug/2018",
+            "media": None
+          },
+          {
+            "name": "GrrCON 2018",
+            "url": "http://grrcon.com/presentations/",
+            "pretty_date": "Sep/2018",
+            "media": None
+          },
+          {
+            "name": "BSides Zurich 2018",
+            "url": "https://bsideszh.ch/agenda/abstracts/",
+            "pretty_date": "Sep/2018",
+            "media": None
+          },
+          {
+            "name": "SecTor 2018",
+            "url": "https://sector.ca/sessions/angad-a-malware-detection-framework-using-multi-dimensional-visualization/",
+            "pretty_date": "Oct/2018",
+            "media": None
+          },
+        ]
+      },
       {
         "title": "Visual Network and File Forensics",
         "description": "This presentation aims to demo the effectiveness of visual tooling for malware and file-format forensics. It will cover structural analysis and visualization of malware and network artifacts. Various techniques like entropy/n-gram visualization, using compression-ratio and theoretical minsize to identify file type and packed content will be shown. Along with this, a framework that helps automate these tasks will be presented. Attendees with an interest in network monitoring, signature writing, malware analysis and forensics will find this presentation to be useful.",

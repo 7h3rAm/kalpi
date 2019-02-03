@@ -391,6 +391,9 @@ class kalpi:
   def gen_projects(self):
     self.write_file("projects%s" % self.urlextension, self.env.get_template("projects.html").render(posts=self.files, baseurl=self.baseurl, data=self.data, blogtheme=self.blogtheme, codehilitetheme=self.codehilitetheme, date=self.date))
 
+  def gen_earthview(self):
+    self.write_file("earthview%s" % self.urlextension, self.env.get_template("earthview.html").render())
+
   def gen_rss(self):
     self.write_feed("rss.xml", self.env.get_template("rss.html").render(posts=self.files[:self.homepostscount], baseurl=self.baseurl, blogtheme=self.blogtheme, codehilitetheme=self.codehilitetheme, date=self.date))
 
@@ -474,6 +477,7 @@ class kalpi:
     self.gen_tags()
     self.gen_research()
     self.gen_projects()
+    self.gen_earthview()
     self.gen_rss()
     self.gen_sitemap()
     self.gen_stats()
