@@ -5,6 +5,8 @@ import re
 import time
 import random
 import markdown
+import dateutil.relativedelta
+from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 
 import utils
@@ -27,14 +29,9 @@ class Kalpi:
       "archive.html": "%s/archive.html" % (self.outputdir),
       "tags.html": "%s/tags.html" % (self.outputdir),
       "research.html": "%s/research.html" % (self.outputdir),
+      "stats.html": "%s/stats.html" % (self.outputdir),
       "earthview.html": "%s/earthview.html" % (self.outputdir),
     }
-    self.stats = dict({
-      "count_posts": 0,
-      "count_tags": 0,
-      "count_words": 0,
-      "count_readtime": 0,
-    })
 
     self.timeformat = "%B %-d, %Y"
     self.timeformat = "%Y %b %d"
@@ -92,31 +89,39 @@ class Kalpi:
     else:
       utils.warn("could not find mapping for file '%s'" % (utils.red(templatefile)))
 
-  def poststats(self, title, date, summary, tags, content, wpm=240, avgwordlen=5.1):
-    wps = wpm/60
-    poststats = dict({
-      "title": title,
-      "year": date[:3][0],
-      "month": date[:3][1],
-      "day": date[:3][2],
-      "words": 0,
-      "characters": 0,
-      "images": 0,
-      "readtime": 0,
-      "readtimestr": None,
-    })
-    for word in content.split(" "):
-      poststats["characters"] += len(word)
-    poststats["words"] = poststats["characters"]//avgwordlen
-    self.stats["count_words"] += poststats["words"]
-    t = content.split(" ")
-    l = len(t)
-    poststats["readtime"] = poststats["words"]/wps
-    poststats["readtime"] += 1 if poststats["words"]%wps else 0
-    poststats["readtimestr"] = utils.sec_to_human(poststats["readtime"])
-    self.stats["count_readtime"] += poststats["readtime"]
-    poststats["images"] = len(re.findall(r"<img src=", content))
-    return poststats
+  def tag_cloud(self):
+    colors = ["#20b2aa", "#99cc99", "#f2777a", "#bc8f8f", "#d27b53", "#f90", "#ffcc66", "#08f", "#6699cc", "#671d9d", "#cc99cc"]
+    random.shuffle(colors)
+    maxtagcount = 0
+    tags, tagcloud = {}, {}
+    for tag in self.datadict["tags"]:
+      tagcloud[tag] = None
+      tags[tag] = len(self.datadict["tags"][tag])
+      if tags[tag] > maxtagcount:
+        maxtagcount = tags[tag]
+    for tag in tags:
+      percent = (tags[tag]*100/maxtagcount)
+      if percent <= 10:
+        tagcloud[tag] = "font-size:1.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[0])
+      elif percent <= 20:
+        tagcloud[tag] = "font-size:1.5em; font-weight:bold; color:%s; padding:20px 5px 20px 5px;" % (colors[1])
+      elif percent <= 30:
+        tagcloud[tag] = "font-size:2.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[2])
+      elif percent <= 40:
+        tagcloud[tag] = "font-size:2.5em; font-weight:bold; color:%s; padding:20px 5px 20px 5px;" % (colors[3])
+      elif percent <= 50:
+        tagcloud[tag] = "font-size:3.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[4])
+      elif percent <= 60:
+        tagcloud[tag] = "font-size:3.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[5])
+      elif percent <= 70:
+        tagcloud[tag] = "font-size:4.0em; color:%s; padding:0px 5px 0px 5px;" % (colors[6])
+      elif percent <= 80:
+        tagcloud[tag] = "font-size:4.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[7])
+      elif percent <= 90:
+        tagcloud[tag] = "font-size:5.0em; color:%s; padding:0px 5px 0px 5px;" % (colors[8])
+      elif percent <= 100:
+        tagcloud[tag] = "font-size:5.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[0])
+    return tagcloud
 
   def parse(self, lines):
     date, summary, tags, content = None, None, None, None
@@ -164,7 +169,6 @@ class Kalpi:
             "tags": tags,
             "summary": summary,
             "filename": name,
-            "stats": self.poststats(title, date, summary, tags, content),
             "previous": None,
             "next": None,
           }
@@ -184,39 +188,116 @@ class Kalpi:
               })
     return posts
 
-  def tag_cloud(self):
-    colors = ["#20b2aa", "#99cc99", "#f2777a", "#bc8f8f", "#d27b53", "#f90", "#ffcc66", "#08f", "#6699cc", "#671d9d", "#cc99cc"]
-    random.shuffle(colors)
-    maxtagcount = 0
-    tags, tagcloud = {}, {}
-    for tag in self.datadict["tags"]:
-      tagcloud[tag] = None
-      tags[tag] = len(self.datadict["tags"][tag])
-      if tags[tag] > maxtagcount:
-        maxtagcount = tags[tag]
-    for tag in tags:
-      percent = (tags[tag]*100/maxtagcount)
-      if percent <= 10:
-        tagcloud[tag] = "font-size:1.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[0])
-      elif percent <= 20:
-        tagcloud[tag] = "font-size:1.5em; font-weight:bold; color:%s; padding:20px 5px 20px 5px;" % (colors[1])
-      elif percent <= 30:
-        tagcloud[tag] = "font-size:2.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[2])
-      elif percent <= 40:
-        tagcloud[tag] = "font-size:2.5em; font-weight:bold; color:%s; padding:20px 5px 20px 5px;" % (colors[3])
-      elif percent <= 50:
-        tagcloud[tag] = "font-size:3.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[4])
-      elif percent <= 60:
-        tagcloud[tag] = "font-size:3.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[5])
-      elif percent <= 70:
-        tagcloud[tag] = "font-size:4.0em; color:%s; padding:0px 5px 0px 5px;" % (colors[6])
-      elif percent <= 80:
-        tagcloud[tag] = "font-size:4.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[7])
-      elif percent <= 90:
-        tagcloud[tag] = "font-size:5.0em; color:%s; padding:0px 5px 0px 5px;" % (colors[8])
-      elif percent <= 100:
-        tagcloud[tag] = "font-size:5.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[0])
-    return tagcloud
+  def gen_stats(self):
+    stats = {}
+    stats["count_posts"] = len(self.datadict["posts"])
+    stats["count_tags"] = len(self.datadict["tags"])
+    stats["groups"] = {
+      "per_yyyymm": {},
+      "per_yyyy": {},
+      "per_tag": {},
+    }
+    stats["duration"] = {
+      "start_year": 2100,
+      "end_year": 2000,
+    }
+    stats["dates"] = []
+
+    for post in self.datadict["posts"]:
+      if post["year"] < stats["duration"]["start_year"]:
+        stats["duration"]["start_year"] = post["year"]
+      if post["year"] > stats["duration"]["end_year"]:
+        stats["duration"]["end_year"] = post["year"]
+
+      stats["dates"].append("%04d%02d%02d" % (post["year"], post["month"], post["day"]))
+
+      key = "%04d%02d" % (post["year"], post["month"])
+      if key not in stats["groups"]["per_yyyymm"]:
+        stats["groups"]["per_yyyymm"][key] = {
+          "posts": 1,
+          "tags": len(post["tags"]),
+        }
+      else:
+        stats["groups"]["per_yyyymm"][key]
+        stats["groups"]["per_yyyymm"][key]["posts"] += 1
+        stats["groups"]["per_yyyymm"][key]["tags"] += len(post["tags"])
+
+      key = "%04d" % (post["year"])
+      if key not in stats["groups"]["per_yyyy"]:
+        stats["groups"]["per_yyyy"][key] = {
+          "posts": 1,
+          "tags": len(post["tags"]),
+        }
+      else:
+        stats["groups"]["per_yyyy"][key]
+        stats["groups"]["per_yyyy"][key]["posts"] += 1
+        stats["groups"]["per_yyyy"][key]["tags"] += len(post["tags"])
+
+      for tag in post["tags"]:
+        if tag not in stats["groups"]["per_tag"]:
+          stats["groups"]["per_tag"][tag] = {
+            "posts": 1,
+          }
+        else:
+          stats["groups"]["per_tag"][tag]["posts"] += 1
+
+    stats["most_used_tag"] = max(stats["groups"]["per_tag"].keys(), key=(lambda key: stats["groups"]["per_tag"][key]["posts"]))
+    stats["least_used_tag"] = min(stats["groups"]["per_tag"].keys(), key=(lambda key: stats["groups"]["per_tag"][key]["posts"]))
+
+    stats["max_posts_yyyy"] = max(stats["groups"]["per_yyyy"].keys(), key=(lambda key: stats["groups"]["per_yyyy"][key]["posts"]))
+    stats["min_posts_yyyy"] = min(stats["groups"]["per_yyyy"].keys(), key=(lambda key: stats["groups"]["per_yyyy"][key]["posts"]))
+
+    stats["max_tags_yyyy"] = max(stats["groups"]["per_yyyy"].keys(), key=(lambda key: stats["groups"]["per_yyyy"][key]["tags"]))
+    stats["min_tags_yyyy"] = min(stats["groups"]["per_yyyy"].keys(), key=(lambda key: stats["groups"]["per_yyyy"][key]["tags"]))
+
+    curdate = datetime.now()
+    maxdate = datetime.strptime(max(stats["dates"]), "%Y%m%d")
+    mindate = datetime.strptime(min(stats["dates"]), "%Y%m%d")
+    rd1 = dateutil.relativedelta.relativedelta (maxdate, mindate)
+    rd2 = dateutil.relativedelta.relativedelta (curdate, maxdate)
+    rd3 = dateutil.relativedelta.relativedelta (curdate, mindate)
+
+    stats["summary"] = []
+    stats["summary"].append("There are a total of `%d` posts with `%d` tags, written over a period of `%dy%dm%dd` (from `%s` till `%s`)" % (stats["count_posts"], stats["count_tags"], rd1.years, rd1.months, rd1.days, datetime.strftime(mindate, "%d/%b/%Y"), datetime.strftime(maxdate, "%d/%b/%Y")))
+    stats["summary"].append("From the most recent update (on `%s`), it's been `%dy%dm%dd` when the last post was published and `%dy%dm%dd` since the first post" % (datetime.strftime(curdate, "%d/%b/%Y"), rd2.years, rd2.months, rd2.days, rd3.years, rd3.months, rd3.days))
+    stats["summary"].append("The year `%s` had highest number of posts with a count of `%d`, while the year `%s` had lowest number of posts with a count of `%d`" % (stats["max_posts_yyyy"], stats["groups"]["per_yyyy"][stats["max_posts_yyyy"]]["posts"], stats["min_posts_yyyy"], stats["groups"]["per_yyyy"][stats["min_posts_yyyy"]]["posts"]))
+    stats["summary"].append("The year `%s` had highest number of tags with a count of `%d`, while the year `%s` had lowest number of tags with a count of `%d`" % (stats["max_tags_yyyy"], stats["groups"]["per_yyyy"][stats["max_tags_yyyy"]]["tags"], stats["min_tags_yyyy"], stats["groups"]["per_yyyy"][stats["min_tags_yyyy"]]["tags"]))
+    stats["summary"].append("The most widely used of all `%d` tags across `%d` posts is `%s` while the least used is `%s`" % (stats["count_tags"], stats["count_posts"], stats["most_used_tag"], stats["least_used_tag"]))
+    stats["summary"].append("On an average, there were `%d` posts per tag and `%d` posts, `%d` tags per year" % (sum([stats["groups"]["per_tag"][x]["posts"] for x in stats["groups"]["per_tag"]])/len(stats["groups"]["per_tag"].keys()), sum([stats["groups"]["per_yyyy"][x]["posts"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys()), sum([stats["groups"]["per_yyyy"][x]["tags"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys())))
+    stats["summary"] = [self.md2html(x).replace("<p>", "").replace("</p>", "") for x in stats["summary"]]
+
+    ppt = {
+      "buffer_overflow": 12,
+      "code": 16,
+      "ctf": 3,
+      "exploit": 11,
+      "mitigations": 6,
+      "reversing": 5,
+      "shellcode": 4,
+      "vulnweekends": 9,
+      "writeups": 13,
+    }
+    utils.to_xkcd(ppt, "%s/static/files/posts_per_tag.png" % (self.outputdir), "")
+    ppy = {
+      "2011": 6,
+      "2012": 10,
+      "2013": 10,
+      "2014": 9,
+      "2015": 4,
+      "2016": 2,
+    }
+    utils.to_xkcd(ppy, "%s/static/files/posts_per_year.png" % (self.outputdir), "")
+    tpy = {
+      "2011": 6,
+      "2012": 19,
+      "2013": 25,
+      "2014": 18,
+      "2015": 7,
+      "2016": 4,
+    }
+    utils.to_xkcd(tpy, "%s/static/files/tags_per_year.png" % (self.outputdir), "")
+
+    return stats
 
   def make(self):
     posts = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=False)
@@ -244,12 +325,18 @@ class Kalpi:
       utils.info("rendered '%s' (%sB)" % (utils.magenta(filename), utils.blue(len(output))))
 
     self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
+
     self.render_template("index.html")
     self.render_template("archive.html")
     self.render_template("research.html")
-    self.render_template("earthview.html")
+
     self.datadict["tagcloud"] = self.tag_cloud()
     self.render_template("tags.html")
+
+    self.datadict["stats"] = self.gen_stats()
+    self.render_template("stats.html")
+
+    self.render_template("earthview.html")
 
 
 if __name__ == "__main__":
