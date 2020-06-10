@@ -15,11 +15,12 @@ class Kalpi:
     self.datadict = {}
     self.datadict["tags"] = {}
     self.datadict["posts"] = {}
-    self.datadict["metadata"] = utils.load_yaml("%s/toolbox/misc/blog/static/files/self.yml" % (utils.expand_env(var="$HOME")))["metadata"]
+    self.basedir = "%s/toolbox/repos/7h3rAm.github.io" % (utils.expand_env(var="$HOME"))
+    self.datadict["metadata"] = utils.load_yaml("%s/static/files/self.yml" % (self.basedir))["metadata"]
 
-    self.postsdir = "%s/toolbox/misc/blog/_posts" % (utils.expand_env(var="$HOME"))
-    self.templatesdir = "%s/toolbox/misc/blog/_templates" % (utils.expand_env(var="$HOME"))
-    self.outputdir = "%s/toolbox/misc/blog" % (utils.expand_env(var="$HOME"))
+    self.postsdir = "%s/_posts" % (self.basedir)
+    self.templatesdir = "%s/_templates" % (self.basedir)
+    self.outputdir = self.basedir
 
     self.templatemapping = {
       "index.html": "%s/index.html" % (self.outputdir),
@@ -47,30 +48,6 @@ class Kalpi:
     self.relatedpostsstrategy = "tags_random"
 
     self.prep_datadict()
-
-    self.months = {
-      1: "January",
-      2: "February",
-      3: "March",
-      4: "April",
-      5: "May",
-      6: "June",
-      7: "July",
-      8: "August",
-      9: "September",
-      10: "October",
-      11: "November",
-      12: "December"
-    }
-
-  def get_current_date(self, timeformat="%B %-d, %Y"):
-    return time.strftime(timeformat)
-
-  def get_month_name(self, monthint):
-    if monthint >= 1 and monthint <= 12:
-      return self.months[monthint]
-    else:
-      return None
 
   def join_list(self, inlist, url="/tags.html#"):
     outlist = []
@@ -102,7 +79,6 @@ class Kalpi:
     env = Environment(loader=FileSystemLoader(self.templatesdir), extensions=["jinja2_markdown.MarkdownExtension"])
     env.trim_blocks = True
     env.lsrtip_blocks = True
-    env.filters["monthname"] = self.get_month_name
     env.filters["joinlist"] = self.join_list
     env.filters["joinlistand"] = self.join_list_and
     env.filters["trimlength"] = self.trim_length
