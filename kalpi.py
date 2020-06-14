@@ -17,6 +17,7 @@ class Kalpi:
     self.datadict = {}
     self.datadict["tags"] = {}
     self.datadict["posts"] = {}
+    self.datadict["recent_count"] = 5
     self.basedir = "%s/toolbox/repos/7h3rAm.github.io" % (utils.expand_env(var="$HOME"))
     self.datadict["metadata"] = utils.load_yaml("%s/static/files/self.yml" % (self.basedir))["metadata"]
 
@@ -149,7 +150,8 @@ class Kalpi:
         path = os.path.join(root, name)
         with open(path, "r") as f:
           title = f.readline()[:-1].strip("\n..")
-          date, summary, tags, content = self.parse(f.readlines())
+          contentmd = f.readlines()
+          date, summary, tags, content = self.parse(contentmd)
           year, month, day = date[:3]
           pretty_date = time.strftime(self.postdateformat, date)
           epoch = time.mktime(date)
@@ -158,6 +160,7 @@ class Kalpi:
             "title": title,
             "epoch": epoch,
             "content": content,
+            "contentmd": contentmd,
             "url": url,
             "pretty_date": pretty_date,
             "sdate": time.strftime(self.stimeformat, date),
@@ -263,7 +266,7 @@ class Kalpi:
     stats["summary"].append("The year `%s` had highest number of posts with a count of `%d`, while the year `%s` had lowest number of posts with a count of `%d`" % (stats["max_posts_yyyy"], stats["groups"]["per_yyyy"][stats["max_posts_yyyy"]]["posts"], stats["min_posts_yyyy"], stats["groups"]["per_yyyy"][stats["min_posts_yyyy"]]["posts"]))
     stats["summary"].append("The year `%s` had highest number of tags with a count of `%d`, while the year `%s` had lowest number of tags with a count of `%d`" % (stats["max_tags_yyyy"], stats["groups"]["per_yyyy"][stats["max_tags_yyyy"]]["tags"], stats["min_tags_yyyy"], stats["groups"]["per_yyyy"][stats["min_tags_yyyy"]]["tags"]))
     stats["summary"].append("The most widely used of all `%d` tags across `%d` posts is `%s` while the least used is `%s`" % (stats["count_tags"], stats["count_posts"], stats["most_used_tag"], stats["least_used_tag"]))
-    stats["summary"].append("On an average, there were `%d` posts per tag and `%d` posts, `%d` tags per year" % (sum([stats["groups"]["per_tag"][x]["posts"] for x in stats["groups"]["per_tag"]])/len(stats["groups"]["per_tag"].keys()), sum([stats["groups"]["per_yyyy"][x]["posts"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys()), sum([stats["groups"]["per_yyyy"][x]["tags"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys())))
+    stats["summary"].append("On an average, there are `%d` posts per tag and `%d` posts, `%d` tags per year" % (sum([stats["groups"]["per_tag"][x]["posts"] for x in stats["groups"]["per_tag"]])/len(stats["groups"]["per_tag"].keys()), sum([stats["groups"]["per_yyyy"][x]["posts"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys()), sum([stats["groups"]["per_yyyy"][x]["tags"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys())))
     stats["summary"] = [self.md2html(x).replace("<p>", "").replace("</p>", "") for x in stats["summary"]]
 
     ppt = {
@@ -329,14 +332,13 @@ class Kalpi:
     self.render_template("index.html")
     self.render_template("archive.html")
     self.render_template("research.html")
+    self.render_template("earthview.html")
 
     self.datadict["tagcloud"] = self.tag_cloud()
     self.render_template("tags.html")
 
     self.datadict["stats"] = self.gen_stats()
     self.render_template("stats.html")
-
-    self.render_template("earthview.html")
 
 
 if __name__ == "__main__":

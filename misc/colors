@@ -1,0 +1,134 @@
+
+def tint(color, factor=0.75):
+  # https://stackoverflow.com/a/6615053/1079836
+  rgb = tuple(int(color.replace("#", "")[i:i+2], 16) for i in (0, 2, 4))
+  trgb = (int(rgb[0] + (factor * (255 - rgb[0]))), int(rgb[1] + (factor * (255 - rgb[1]))), int(rgb[2] + (factor * (255 - rgb[2]))))
+  return "#%s" % ("".join(["%x" % (x) for x in trgb]))
+
+colors = ["#48ffff", "#ff65ff", "#ffff6c", "#ffff6c", "#6f0000", "#484848", "#656565", "#006c6c", "#6c006c", "#006f6f", "#202020"]
+
+>>> factor = 0.25; print("\n".join(["color = %s , tint = %s" % (color, tint(color, factor)) for color in colors]))
+color = #48ffff , tint = #75ffff
+color = #ff65ff , tint = #ff8bff
+color = #ffff6c , tint = #ffff90
+color = #ffff6c , tint = #ffff90
+color = #6f0000 , tint = #933f3f
+color = #484848 , tint = #757575
+color = #656565 , tint = #8b8b8b
+color = #006c6c , tint = #3f9090
+color = #6c006c , tint = #903f90
+color = #006f6f , tint = #3f9393
+color = #202020 , tint = #575757
+>>> 
+>>> factor = 0.50; print("\n".join(["color = %s , tint = %s" % (color, tint(color, factor)) for color in colors]))
+color = #48ffff , tint = #a3ffff
+color = #ff65ff , tint = #ffb2ff
+color = #ffff6c , tint = #ffffb5
+color = #ffff6c , tint = #ffffb5
+color = #6f0000 , tint = #b77f7f
+color = #484848 , tint = #a3a3a3
+color = #656565 , tint = #b2b2b2
+color = #006c6c , tint = #7fb5b5
+color = #6c006c , tint = #b57fb5
+color = #006f6f , tint = #7fb7b7
+color = #202020 , tint = #8f8f8f
+>>> 
+>>> factor = 0.75; print("\n".join(["color = %s , tint = %s" % (color, tint(color, factor)) for color in colors]))
+color = #48ffff , tint = #d1ffff
+color = #ff65ff , tint = #ffd8ff
+color = #ffff6c , tint = #ffffda
+color = #ffff6c , tint = #ffffda
+color = #6f0000 , tint = #dbbfbf
+color = #484848 , tint = #d1d1d1
+color = #656565 , tint = #d8d8d8
+color = #006c6c , tint = #bfdada
+color = #6c006c , tint = #dabfda
+color = #006f6f , tint = #bfdbdb
+color = #202020 , tint = #c7c7c7
+>>> 
+
+---
+
+A  41 #610000
+B  42 #006200
+C  43 #000063
+D  44 #64ffff
+E  45 #ff65ff
+F  46 #ffff65
+G  47 #677f7f
+H  48 #7f687f
+I  49 #7f7f69
+J  4a #6a00ff
+K  4b #ff6b00
+L  4c #ff006c
+M  4d #6d7fff
+N  4e #ff6e7f
+O  4f #7FFF6f
+P  50 #F07178
+Q  51 #F78C6C
+R  52 #FFCB6B
+S  53 #C3E88D
+T  54 #89DDFF
+U  55 #82AAFF
+V  56 #C792EA
+W  57 #FF5370
+X  58 #795da3
+Y  59 #183691
+Z  5a #a71d5d
+
+a  61 #610000
+b  62 #006200
+c  63 #000063
+d  64 #64ffff
+e  65 #ff65ff
+f  66 #ffff65
+g  67 #677f7f
+h  68 #7f687f
+i  69 #7f7f69
+j  6a #6a00ff
+k  6b #ff6b00
+l  6c #ff006c
+m  6d #6d7fff
+n  6e #ff6e7f
+o  6f #7FFF6f
+p  70 #F07178
+q  71 #F78C6C
+r  72 #FFCB6B
+s  73 #C3E88D
+t  74 #89DDFF
+u  75 #82AAFF
+v  76 #C792EA
+w  77 #FF5370
+x  78 #795da3
+y  79 #183691
+z  7a #a71d5d
+
+0  30 #c8c8fa
+1  31 #ed6a43
+2  32 #0086b3
+3  33 #795da3
+4  34 #183691
+5  35 #a71d5d
+6  36 #7FFF6f
+7  37 #F07178
+8  38 #F78C6C
+9  39 #FFCB6B
++  2b #C3E88D
+/  2f #89DDFF
+=  3d #82AAFF
+
+colors = [ "#610000", "#006200", "#000063", "#64ffff", "#ff65ff", "#ffff65", "#677f7f", "#7f687f", "#7f7f69", "#6a00ff", "#ff6b00", "#ff006c", "#6d7fff", "#ff6e7f", "#7FFF6f", "#F07178", "#F78C6C", "#FFCB6B", "#C3E88D", "#89DDFF", "#82AAFF", "#C792EA", "#FF5370", "#795da3", "#183691", "#a71d5d", "#610000", "#006200", "#000063", "#64ffff", "#ff65ff", "#ffff65", "#677f7f", "#7f687f", "#7f7f69", "#6a00ff", "#ff6b00", "#ff006c", "#6d7fff", "#ff6e7f", "#7FFF6f", "#F07178", "#F78C6C", "#FFCB6B", "#C3E88D", "#89DDFF", "#82AAFF", "#C792EA", "#FF5370", "#795da3", "#183691", "#a71d5d", "#c8c8fa", "#ed6a43", "#0086b3", "#795da3", "#183691", "#a71d5d", "#7FFF6f", "#F07178", "#F78C6C", "#FFCB6B", "#C3E88D", "#89DDFF", "#82AAFF"]
+
+>>> for i in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+...   print(i, [tint(color, i) for color in colors])
+... 
+0.1 ['#701919', '#197119', '#191972', '#73ffff', '#ff74ff', '#ffff74', '#768b8b', '#8b778b', '#8b8b78', '#7819ff', '#ff7919', '#ff197a', '#7b8bff', '#ff7c8b', '#8bff7d', '#f17f85', '#f7977a', '#ffd079', '#c9ea98', '#94e0ff', '#8eb2ff', '#cc9cec', '#ff647e', '#866dac', '#2f4a9c', '#af336d', '#701919', '#197119', '#191972', '#73ffff', '#ff74ff', '#ffff74', '#768b8b', '#8b778b', '#8b8b78', '#7819ff', '#ff7919', '#ff197a', '#7b8bff', '#ff7c8b', '#8bff7d', '#f17f85', '#f7977a', '#ffd079', '#c9ea98', '#94e0ff', '#8eb2ff', '#cc9cec', '#ff647e', '#866dac', '#2f4a9c', '#af336d', '#cdcdfa', '#ee7855', '#1992ba', '#866dac', '#2f4a9c', '#af336d', '#8bff7d', '#f17f85', '#f7977a', '#ffd079', '#c9ea98', '#94e0ff', '#8eb2ff']
+0.2 ['#803333', '#338133', '#333382', '#83ffff', '#ff83ff', '#ffff83', '#859898', '#988698', '#989887', '#8733ff', '#ff8833', '#ff3389', '#8a98ff', '#ff8b98', '#98ff8b', '#f38d93', '#f8a389', '#ffd588', '#cfeca3', '#a0e3ff', '#9bbbff', '#d2a7ee', '#ff758c', '#937db5', '#465ea7', '#b84a7d', '#803333', '#338133', '#333382', '#83ffff', '#ff83ff', '#ffff83', '#859898', '#988698', '#989887', '#8733ff', '#ff8833', '#ff3389', '#8a98ff', '#ff8b98', '#98ff8b', '#f38d93', '#f8a389', '#ffd588', '#cfeca3', '#a0e3ff', '#9bbbff', '#d2a7ee', '#ff758c', '#937db5', '#465ea7', '#b84a7d', '#d3d3fb', '#f08768', '#339ec2', '#937db5', '#465ea7', '#b84a7d', '#98ff8b', '#f38d93', '#f8a389', '#ffd588', '#cfeca3', '#a0e3ff', '#9bbbff']
+0.3 ['#904c4c', '#4c914c', '#4c4c91', '#92ffff', '#ff93ff', '#ffff93', '#94a5a5', '#a595a5', '#a5a596', '#964cff', '#ff974c', '#ff4c98', '#98a5ff', '#ff99a5', '#a5ff9a', '#f49ba0', '#f9ae98', '#ffda97', '#d5eeaf', '#ace7ff', '#a7c3ff', '#d7b2f0', '#ff869a', '#a18dbe', '#5d72b2', '#c1608d', '#904c4c', '#4c914c', '#4c4c91', '#92ffff', '#ff93ff', '#ffff93', '#94a5a5', '#a595a5', '#a5a596', '#964cff', '#ff974c', '#ff4c98', '#98a5ff', '#ff99a5', '#a5ff9a', '#f49ba0', '#f9ae98', '#ffda97', '#d5eeaf', '#ace7ff', '#a7c3ff', '#d7b2f0', '#ff869a', '#a18dbe', '#5d72b2', '#c1608d', '#d8d8fb', '#f2967b', '#4caac9', '#a18dbe', '#5d72b2', '#c1608d', '#a5ff9a', '#f49ba0', '#f9ae98', '#ffda97', '#d5eeaf', '#ace7ff', '#a7c3ff']
+0.4 ['#a06666', '#66a066', '#6666a1', '#a2ffff', '#ffa2ff', '#ffffa2', '#a3b2b2', '#b2a4b2', '#b2b2a5', '#a566ff', '#ffa666', '#ff66a6', '#a7b2ff', '#ffa8b2', '#b2ffa8', '#f6a9ae', '#fabaa6', '#ffdfa6', '#dbf1ba', '#b8eaff', '#b4ccff', '#ddbdf2', '#ff97a9', '#ae9dc7', '#7486bd', '#ca779d', '#a06666', '#66a066', '#6666a1', '#a2ffff', '#ffa2ff', '#ffffa2', '#a3b2b2', '#b2a4b2', '#b2b2a5', '#a566ff', '#ffa666', '#ff66a6', '#a7b2ff', '#ffa8b2', '#b2ffa8', '#f6a9ae', '#fabaa6', '#ffdfa6', '#dbf1ba', '#b8eaff', '#b4ccff', '#ddbdf2', '#ff97a9', '#ae9dc7', '#7486bd', '#ca779d', '#dedefc', '#f4a58e', '#66b6d1', '#ae9dc7', '#7486bd', '#ca779d', '#b2ffa8', '#f6a9ae', '#fabaa6', '#ffdfa6', '#dbf1ba', '#b8eaff', '#b4ccff']
+0.5 ['#b07f7f', '#7fb07f', '#7f7fb1', '#b1ffff', '#ffb2ff', '#ffffb2', '#b3bfbf', '#bfb3bf', '#bfbfb4', '#b47fff', '#ffb57f', '#ff7fb5', '#b6bfff', '#ffb6bf', '#bfffb7', '#f7b8bb', '#fbc5b5', '#ffe5b5', '#e1f3c6', '#c4eeff', '#c0d4ff', '#e3c8f4', '#ffa9b7', '#bcaed1', '#8b9ac8', '#d38eae', '#b07f7f', '#7fb07f', '#7f7fb1', '#b1ffff', '#ffb2ff', '#ffffb2', '#b3bfbf', '#bfb3bf', '#bfbfb4', '#b47fff', '#ffb57f', '#ff7fb5', '#b6bfff', '#ffb6bf', '#bfffb7', '#f7b8bb', '#fbc5b5', '#ffe5b5', '#e1f3c6', '#c4eeff', '#c0d4ff', '#e3c8f4', '#ffa9b7', '#bcaed1', '#8b9ac8', '#d38eae', '#e3e3fc', '#f6b4a1', '#7fc2d9', '#bcaed1', '#8b9ac8', '#d38eae', '#bfffb7', '#f7b8bb', '#fbc5b5', '#ffe5b5', '#e1f3c6', '#c4eeff', '#c0d4ff']
+0.6 ['#bf9999', '#99c099', '#9999c0', '#c1ffff', '#ffc1ff', '#ffffc1', '#c2cbcb', '#cbc2cb', '#cbcbc3', '#c399ff', '#ffc399', '#ff99c4', '#c4cbff', '#ffc5cb', '#cbffc5', '#f9c6c9', '#fbd1c4', '#ffeac3', '#e7f5d1', '#cff1ff', '#cdddff', '#e8d3f6', '#ffbac5', '#c9beda', '#a2aed3', '#dba4be', '#bf9999', '#99c099', '#9999c0', '#c1ffff', '#ffc1ff', '#ffffc1', '#c2cbcb', '#cbc2cb', '#cbcbc3', '#c399ff', '#ffc399', '#ff99c4', '#c4cbff', '#ffc5cb', '#cbffc5', '#f9c6c9', '#fbd1c4', '#ffeac3', '#e7f5d1', '#cff1ff', '#cdddff', '#e8d3f6', '#ffbac5', '#c9beda', '#a2aed3', '#dba4be', '#e9e9fd', '#f7c3b3', '#99cee0', '#c9beda', '#a2aed3', '#dba4be', '#cbffc5', '#f9c6c9', '#fbd1c4', '#ffeac3', '#e7f5d1', '#cff1ff', '#cdddff']
+0.7 ['#cfb2b2', '#b2cfb2', '#b2b2d0', '#d0ffff', '#ffd0ff', '#ffffd0', '#d1d8d8', '#d8d1d8', '#d8d8d2', '#d2b2ff', '#ffd2b2', '#ffb2d2', '#d3d8ff', '#ffd3d8', '#d8ffd3', '#fad4d6', '#fcdcd2', '#ffefd2', '#edf8dc', '#dbf4ff', '#d9e5ff', '#eedef8', '#ffcbd4', '#d6cee3', '#b9c2de', '#e4bbce', '#cfb2b2', '#b2cfb2', '#b2b2d0', '#d0ffff', '#ffd0ff', '#ffffd0', '#d1d8d8', '#d8d1d8', '#d8d8d2', '#d2b2ff', '#ffd2b2', '#ffb2d2', '#d3d8ff', '#ffd3d8', '#d8ffd3', '#fad4d6', '#fcdcd2', '#ffefd2', '#edf8dc', '#dbf4ff', '#d9e5ff', '#eedef8', '#ffcbd4', '#d6cee3', '#b9c2de', '#e4bbce', '#eeeefd', '#f9d2c6', '#b2dae8', '#d6cee3', '#b9c2de', '#e4bbce', '#d8ffd3', '#fad4d6', '#fcdcd2', '#ffefd2', '#edf8dc', '#dbf4ff', '#d9e5ff']
+0.8 ['#dfcccc', '#ccdfcc', '#ccccdf', '#e0ffff', '#ffe0ff', '#ffffe0', '#e0e5e5', '#e5e0e5', '#e5e5e1', '#e1ccff', '#ffe1cc', '#ffcce1', '#e1e5ff', '#ffe2e5', '#e5ffe2', '#fce2e4', '#fde8e1', '#fff4e1', '#f3fae8', '#e7f8ff', '#e6eeff', '#f3e9fa', '#ffdce2', '#e4deec', '#d0d6e9', '#edd1de', '#dfcccc', '#ccdfcc', '#ccccdf', '#e0ffff', '#ffe0ff', '#ffffe0', '#e0e5e5', '#e5e0e5', '#e5e5e1', '#e1ccff', '#ffe1cc', '#ffcce1', '#e1e5ff', '#ffe2e5', '#e5ffe2', '#fce2e4', '#fde8e1', '#fff4e1', '#f3fae8', '#e7f8ff', '#e6eeff', '#f3e9fa', '#ffdce2', '#e4deec', '#d0d6e9', '#edd1de', '#f4f4fe', '#fbe1d9', '#cce6ef', '#e4deec', '#d0d6e9', '#edd1de', '#e5ffe2', '#fce2e4', '#fde8e1', '#fff4e1', '#f3fae8', '#e7f8ff', '#e6eeff']
+0.9 ['#efe5e5', '#e5efe5', '#e5e5ef', '#efffff', '#ffefff', '#ffffef', '#eff2f2', '#f2eff2', '#f2f2f0', '#f0e5ff', '#fff0e5', '#ffe5f0', '#f0f2ff', '#fff0f2', '#f2fff0', '#fdf0f1', '#fef3f0', '#fff9f0', '#f9fcf3', '#f3fbff', '#f2f6ff', '#f9f4fc', '#ffedf0', '#f1eef5', '#e7eaf4', '#f6e8ee', '#efe5e5', '#e5efe5', '#e5e5ef', '#efffff', '#ffefff', '#ffffef', '#eff2f2', '#f2eff2', '#f2f2f0', '#f0e5ff', '#fff0e5', '#ffe5f0', '#f0f2ff', '#fff0f2', '#f2fff0', '#fdf0f1', '#fef3f0', '#fff9f0', '#f9fcf3', '#f3fbff', '#f2f6ff', '#f9f4fc', '#ffedf0', '#f1eef5', '#e7eaf4', '#f6e8ee', '#f9f9fe', '#fdf0ec', '#e5f2f7', '#f1eef5', '#e7eaf4', '#f6e8ee', '#f2fff0', '#fdf0f1', '#fef3f0', '#fff9f0', '#f9fcf3', '#f3fbff', '#f2f6ff']
+>>> 

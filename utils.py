@@ -12,6 +12,7 @@ import urllib.request
 import requests
 import sparkline
 import prettytable
+from PIL import Image
 import matplotlib.pyplot as plt
 
 
@@ -554,3 +555,138 @@ def to_sparklines(items, filename, transparent=True):
   plt.tight_layout()
   plt.savefig(filename, dpi=300, transparent=transparent)
   plt.close()
+
+def hex2rgb(hexstr="#ffcb6b"):
+  if hexstr and hexstr != "":
+    return tuple(int(hexstr.replace("#", "")[i:i+2], 16) for i in (0, 2, 4))
+
+def rgb2hex(rgb=(255, 0, 0)):
+  if rgb:
+    return "#%s" % ("".join(["%x" % (x) for x in rgb]))
+
+def tint(color, factor=0.35):
+  # https://stackoverflow.com/a/6615053/1079836
+  # (tint)factor range: 0.1 (dark) - 0.9 (light)
+  rgb = hex2rgb(color)
+  trgb = (int(rgb[0] + (factor * (255 - rgb[0]))), int(rgb[1] + (factor * (255 - rgb[1]))), int(rgb[2] + (factor * (255 - rgb[2]))))
+  return rgb2hex(trgb)
+
+def text2banner(text, filename="test.png", tintfactor=0.35, width=800, dupfactor=10):
+  colormap = {
+    "A": "#610000",
+    "B": "#006200",
+    "C": "#000063",
+    "D": "#64ffff",
+    "E": "#ff65ff",
+    "F": "#ffff65",
+    "G": "#677f7f",
+    "H": "#7f687f",
+    "I": "#7f7f69",
+    "J": "#6a00ff",
+    "K": "#ff6b00",
+    "L": "#ff006c",
+    "M": "#6d7fff",
+    "N": "#ff6e7f",
+    "O": "#7FFF6f",
+    "P": "#F07178",
+    "Q": "#F78C6C",
+    "R": "#FFCB6B",
+    "S": "#C3E88D",
+    "T": "#89DDFF",
+    "U": "#82AAFF",
+    "V": "#C792EA",
+    "W": "#FF5370",
+    "X": "#795da3",
+    "Y": "#183691",
+    "Z": "#a71d5d",
+    "a": "#610000",
+    "b": "#006200",
+    "c": "#000063",
+    "d": "#64ffff",
+    "e": "#ff65ff",
+    "f": "#ffff65",
+    "g": "#677f7f",
+    "h": "#7f687f",
+    "i": "#7f7f69",
+    "j": "#6a00ff",
+    "k": "#ff6b00",
+    "l": "#ff006c",
+    "m": "#6d7fff",
+    "n": "#ff6e7f",
+    "o": "#7FFF6f",
+    "p": "#F07178",
+    "q": "#F78C6C",
+    "r": "#FFCB6B",
+    "s": "#C3E88D",
+    "t": "#89DDFF",
+    "u": "#82AAFF",
+    "v": "#C792EA",
+    "w": "#FF5370",
+    "x": "#795da3",
+    "y": "#183691",
+    "z": "#a71d5d",
+    "0": "#c8c8fa",
+    "1": "#ed6a43",
+    "2": "#0086b3",
+    "3": "#795da3",
+    "4": "#183691",
+    "5": "#a71d5d",
+    "6": "#7FFF6f",
+    "7": "#F07178",
+    "8": "#F78C6C",
+    "9": "#FFCB6B",
+    "+": "#C3E88D",
+    "/": "#89DDFF",
+    "=": "#82AAFF",
+    "\n": "#000000",
+    " ": "#ffffff",
+    ":": "#999999",
+    ".": "#999999",
+    ",": "#999999",
+    "!": "#999999",
+    "#": "#999999",
+    "(": "#999999",
+    ")": "#999999",
+    "`": "#999999",
+    "*": "#999999",
+    "-": "#999999",
+    "_": "#999999",
+    "'": "#999999",
+    "[": "#999999",
+    "]": "#999999",
+    "?": "#999999",
+    "&": "#999999",
+    "~": "#999999",
+    "{": "#999999",
+    "}": "#999999",
+    "<": "#999999",
+    ">": "#999999",
+    "|": "#999999",
+    ";": "#999999",
+    "@": "#999999",
+    "\"": "#999999",
+    "%": "#999999",
+    "$": "#999999",
+    "\\": "#999999",
+    "^": "#999999",
+
+    "\xa0": "",
+    "‘": "",
+    "’": "",
+  }
+  #colors = [hex2rgb("#ff006c"), hex2rgb("#6d7fff"), hex2rgb("#ff6e7f"), hex2rgb("#7FFF6f"), hex2rgb("#F07178"), hex2rgb("#F78C6C"), hex2rgb("#FFCB6B"), hex2rgb("#C3E88D"), hex2rgb("#89DDFF"), hex2rgb("#82AAFF"), hex2rgb("#C792EA"), hex2rgb("#FF5370"), hex2rgb("#795da3"), hex2rgb("#ffff65"), hex2rgb("#6a00ff"), hex2rgb("#ff6b00"), hex2rgb("#ff006c"), hex2rgb("#6d7fff"), hex2rgb("#ff6e7f"), hex2rgb("#7FFF6f"), hex2rgb("#F07178"), hex2rgb("#F78C6C"), hex2rgb("#FFCB6B"), hex2rgb("#C3E88D"), hex2rgb("#89DDFF"), hex2rgb("#82AAFF"), hex2rgb("#C792EA"), hex2rgb("#FF5370"), hex2rgb("#795da3"), hex2rgb("#183691"), hex2rgb("#ff006c"), hex2rgb("#6d7fff"), hex2rgb("#ff6e7f"), hex2rgb("#7FFF6f"), hex2rgb("#F07178"), hex2rgb("#F78C6C"), hex2rgb("#FFCB6B"), hex2rgb("#C3E88D"), hex2rgb("#89DDFF"), hex2rgb("#82AAFF"), hex2rgb("#C792EA"), hex2rgb("#FF5370"), hex2rgb("#795da3"), hex2rgb("#ffff65"), hex2rgb("#6a00ff"), hex2rgb("#ff6b00"), hex2rgb("#ff006c"), hex2rgb("#6d7fff"), hex2rgb("#ff6e7f"), hex2rgb("#7FFF6f"), hex2rgb("#F07178"), hex2rgb("#F78C6C"), hex2rgb("#FFCB6B"), hex2rgb("#C3E88D"), hex2rgb("#89DDFF"), hex2rgb("#82AAFF"), hex2rgb("#C792EA"), hex2rgb("#FF5370"), hex2rgb("#795da3"), hex2rgb("#183691"), hex2rgb("#ff006c"), hex2rgb("#6d7fff"), hex2rgb("#ff6e7f"), hex2rgb("#7FFF6f"), hex2rgb("#F07178"), hex2rgb("#F78C6C"), hex2rgb("#FFCB6B"), hex2rgb("#C3E88D"), hex2rgb("#89DDFF"), hex2rgb("#82AAFF"), hex2rgb("#C792EA"), hex2rgb("#FF5370"), hex2rgb("#795da3"), hex2rgb("#ffff65"), hex2rgb("#6a00ff"), hex2rgb("#ff6b00"), hex2rgb("#ff006c"), hex2rgb("#6d7fff"), hex2rgb("#ff6e7f"), hex2rgb("#7FFF6f"), hex2rgb("#F07178"), hex2rgb("#F78C6C"), hex2rgb("#FFCB6B"), hex2rgb("#C3E88D"), hex2rgb("#89DDFF"), hex2rgb("#82AAFF"), hex2rgb("#C792EA"), hex2rgb("#FF5370"), hex2rgb("#795da3"), hex2rgb("#183691"), hex2rgb("#F07178"), hex2rgb("#F78C6C"), hex2rgb("#FFCB6B"), hex2rgb("#C3E88D"), hex2rgb("#89DDFF"), hex2rgb("#82AAFF"), hex2rgb("#C792EA"), hex2rgb("#FF5370"), hex2rgb("#795da3"), hex2rgb("#183691")]
+  print(len(text))
+  rgblist = list(filter(None, [hex2rgb(colormap[x]) for x in text]))
+  rgblist = rgblist[:800]
+  print(len(rgblist))
+
+  extendedrgblist = []
+
+  print(extendedrgblist)
+  print(len(extendedrgblist))
+
+  height = int(len(extendedrgblist)/width)+1
+  size = (width, int(len(extendedrgblist)/width)+1)
+  im = Image.new("RGB", size)
+  im.putdata(extendedrgblist)
+  im.save(filename, format="PNG")
