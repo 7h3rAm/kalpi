@@ -23,15 +23,19 @@ class Kalpi:
 
     self.postsdir = "%s/_posts" % (self.basedir)
     self.templatesdir = "%s/_templates" % (self.basedir)
+    self.cvmd = "%s/cv.md" % (self.templatesdir)
     self.outputdir = self.basedir
 
     self.templatemapping = {
       "index.html": "%s/index.html" % (self.outputdir),
       "archive.html": "%s/archive.html" % (self.outputdir),
-      "tags.html": "%s/tags.html" % (self.outputdir),
       "research.html": "%s/research.html" % (self.outputdir),
-      "stats.html": "%s/stats.html" % (self.outputdir),
+      "cv.html": "%s/cv.html" % (self.outputdir),
       "earthview.html": "%s/earthview.html" % (self.outputdir),
+      "tags.html": "%s/tags.html" % (self.outputdir),
+      "stats.html": "%s/stats.html" % (self.outputdir),
+      "cv.html": "%s/cv.html" % (self.outputdir),
+      "cvprint.html": "%s/cvprint.html" % (self.outputdir),
     }
 
     self.timeformat = "%B %-d, %Y"
@@ -77,6 +81,7 @@ class Kalpi:
     env = Environment(loader=FileSystemLoader(self.templatesdir), extensions=["jinja2_markdown.MarkdownExtension"])
     env.trim_blocks = True
     env.lsrtip_blocks = True
+    env.filters["md2html"] = self.md2html
     env.filters["joinlist"] = self.join_list
     env.filters["joinlistand"] = self.join_list_and
     env.filters["trimlength"] = self.trim_length
@@ -333,6 +338,8 @@ class Kalpi:
     self.render_template("archive.html")
     self.render_template("research.html")
     self.render_template("earthview.html")
+    self.render_template("cv.html")
+    self.render_template("cvprint.html")
 
     self.datadict["tagcloud"] = self.tag_cloud()
     self.render_template("tags.html")
