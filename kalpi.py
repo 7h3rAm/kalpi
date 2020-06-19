@@ -274,35 +274,13 @@ class Kalpi:
     stats["summary"].append("On an average, there are `%d` posts per tag and `%d` posts, `%d` tags per year" % (sum([stats["groups"]["per_tag"][x]["posts"] for x in stats["groups"]["per_tag"]])/len(stats["groups"]["per_tag"].keys()), sum([stats["groups"]["per_yyyy"][x]["posts"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys()), sum([stats["groups"]["per_yyyy"][x]["tags"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys())))
     stats["summary"] = [self.md2html(x).replace("<p>", "").replace("</p>", "") for x in stats["summary"]]
 
-    ppt = {
-      "buffer_overflow": 12,
-      "code": 16,
-      "ctf": 3,
-      "exploit": 11,
-      "mitigations": 6,
-      "reversing": 5,
-      "shellcode": 4,
-      "vulnweekends": 9,
-      "writeups": 13,
-    }
+    ppt = {tag:stats["groups"]["per_tag"][tag]["posts"] for tag in stats["groups"]["per_tag"]}
     utils.to_xkcd(ppt, "%s/static/files/posts_per_tag.png" % (self.outputdir), "")
-    ppy = {
-      "2011": 6,
-      "2012": 10,
-      "2013": 10,
-      "2014": 9,
-      "2015": 4,
-      "2016": 2,
-    }
+
+    ppy = {yyyy:stats["groups"]["per_yyyy"][yyyy]["posts"] for yyyy in stats["groups"]["per_yyyy"]}
     utils.to_xkcd(ppy, "%s/static/files/posts_per_year.png" % (self.outputdir), "")
-    tpy = {
-      "2011": 6,
-      "2012": 19,
-      "2013": 25,
-      "2014": 18,
-      "2015": 7,
-      "2016": 4,
-    }
+
+    tpy = {yyyy:stats["groups"]["per_yyyy"][yyyy]["tags"] for yyyy in stats["groups"]["per_yyyy"]}
     utils.to_xkcd(tpy, "%s/static/files/tags_per_year.png" % (self.outputdir), "")
 
     return stats
