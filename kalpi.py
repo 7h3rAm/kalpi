@@ -23,7 +23,7 @@ class Kalpi:
 
     self.postsdir = "%s/_posts" % (self.basedir)
     self.templatesdir = "%s/_templates" % (self.basedir)
-    self.cvmd = "%s/cv.md" % (self.templatesdir)
+    self.oscpmd = "%s/oscp.md" % (self.templatesdir)
     self.outputdir = self.basedir
 
     self.templatemapping = {
@@ -34,6 +34,7 @@ class Kalpi:
       "earthview.html": "%s/earthview.html" % (self.outputdir),
       "tags.html": "%s/tags.html" % (self.outputdir),
       "stats.html": "%s/stats.html" % (self.outputdir),
+      "oscp.html": "%s/oscp.html" % (self.outputdir),
       "cv.html": "%s/cv.html" % (self.outputdir),
       "cvprint.html": "%s/cvprint.html" % (self.outputdir),
     }
@@ -311,6 +312,11 @@ class Kalpi:
       utils.info("rendered '%s' (%sB)" % (utils.magenta(filename), utils.blue(len(output))))
 
     self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
+
+    self.datadict["bookmarked"] = {
+      "oscpprep": self.md2html("\n".join(utils.load_file(self.oscpmd))),
+    }
+    self.render_template("oscp.html")
 
     self.render_template("index.html")
     self.render_template("archive.html")

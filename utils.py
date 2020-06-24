@@ -140,12 +140,12 @@ def save_json(datadict, filename):
 def load_file(filename):
   lines = []
   with open(filename) as fp:
-    lines = sorted(list(set(list(list(filter(None, fp.read().split("\n")))))))
+    lines = fp.read().split("\n")
   return lines
 
 def save_file(datalist, filename):
   with open(filename, "w") as fp:
-    fp.write("\n".join(sorted(list(set(list(list(filter(None, datalist))))))))
+    fp.write("\n".join(datalist))
     fp.write("\n")
 
 def load_yaml(filename):
