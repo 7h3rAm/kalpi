@@ -31,7 +31,7 @@ class Kalpi:
       "archive.html": "%s/archive.html" % (self.outputdir),
       "research.html": "%s/research.html" % (self.outputdir),
       "cv.html": "%s/cv.html" % (self.outputdir),
-      "earthview.html": "%s/earthview.html" % (self.outputdir),
+      "satview.html": "%s/satview.html" % (self.outputdir),
       "tags.html": "%s/tags.html" % (self.outputdir),
       "stats.html": "%s/stats.html" % (self.outputdir),
       "oscp.html": "%s/oscp.html" % (self.outputdir),
@@ -321,7 +321,7 @@ class Kalpi:
     self.render_template("index.html")
     self.render_template("archive.html")
     self.render_template("research.html")
-    self.render_template("earthview.html")
+    self.render_template("satview.html")
     self.render_template("cv.html")
     self.render_template("cvprint.html")
 
