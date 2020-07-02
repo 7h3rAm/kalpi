@@ -1,0 +1,15 @@
+
+auto update:
+  re-create every day @ 0000
+  gcp
+
+stats:
+  self:
+    googlefit:
+    twitter:
+    github:
+    hackthebox:
+    vulnhub:
+    tryhackme:
+  mannthan:
+    blog stats
