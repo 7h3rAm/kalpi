@@ -43,7 +43,6 @@ class Kalpi:
     self.timeformat = "%Y %b %d"
     self.stimeformat = "%b %d"
     self.postdateformat = "%d/%b/%Y"
-    self.rssdateformat = "%a, %d %b %Y %H:%M:%S %z"
 
     self.trimlength = 30
     self.relatedpostscount = 3
@@ -170,7 +169,6 @@ class Kalpi:
             "url": url,
             "pretty_date": pretty_date,
             "sdate": time.strftime(self.stimeformat, date),
-            "rssdate": time.strftime(self.rssdateformat, date),
             "date": date,
             "year": year,
             "month": month,
@@ -188,12 +186,18 @@ class Kalpi:
                 "title": title,
                 "url": url,
                 "pretty_date": pretty_date,
+                "year": year,
+                "month": month,
+                "day": day,
               }]
             else:
               self.datadict["tags"][tag].append({
                 "title": title,
                 "url": url,
                 "pretty_date": pretty_date,
+                "year": year,
+                "month": month,
+                "day": day,
               })
     return posts
 
