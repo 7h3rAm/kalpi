@@ -96,7 +96,7 @@ class Kalpi:
       utils.warn("could not find mapping for file '%s'" % (utils.red(templatefile)))
 
   def tag_cloud(self):
-    colors = ["#20b2aa", "#99cc99", "#f2777a", "#bc8f8f", "#d27b53", "#f90", "#ffcc66", "#08f", "#6699cc", "#671d9d", "#cc99cc"]
+    colors = ["#20b2aa", "#99cc99", "#0c9", "#5b92e5", "#ffcc66", "#00b7eb", "#69359c", "#fe4164", "#a50b5e"]
     random.shuffle(colors)
     maxtagcount = 0
     tags, tagcloud = {}, {}
@@ -127,6 +127,11 @@ class Kalpi:
         tagcloud[tag] = "font-size:5.0em; color:%s; padding:0px 5px 0px 5px;" % (colors[8])
       elif percent <= 100:
         tagcloud[tag] = "font-size:5.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[0])
+
+    keys = list(tagcloud.keys())
+    random.shuffle(keys)
+    tagcloud = {key: tagcloud[key] for key in keys}
+
     return tagcloud
 
   def parse(self, lines):
