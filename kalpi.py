@@ -23,7 +23,6 @@ class Kalpi:
 
     self.postsdir = "%s/_posts" % (self.basedir)
     self.templatesdir = "%s/_templates" % (self.basedir)
-    self.oscpmd = "%s/oscp.md" % (self.templatesdir)
     self.outputdir = self.basedir
 
     self.templatemapping = {
@@ -35,6 +34,7 @@ class Kalpi:
       "tags.html": "%s/tags.html" % (self.outputdir),
       "stats.html": "%s/stats.html" % (self.outputdir),
       "oscp.html": "%s/oscp.html" % (self.outputdir),
+      "oscp2.html": "%s/oscp2.html" % (self.outputdir),
       "cv.html": "%s/cv.html" % (self.outputdir),
       "cvprint.html": "%s/cvprint.html" % (self.outputdir),
     }
@@ -320,23 +320,21 @@ class Kalpi:
       utils.file_save(filename, output)
       utils.info("rendered '%s' (%sB)" % (utils.magenta(filename), utils.blue(len(output))))
 
+    # posts
     self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
 
-    self.datadict["bookmarked"] = {
-      "oscpprep": self.md2html("\n".join(utils.load_file(self.oscpmd))),
-    }
-    self.render_template("oscp.html")
-
-    self.render_template("index.html")
-    self.render_template("archive.html")
-    self.render_template("research.html")
-    self.render_template("satview.html")
+    # pages
     self.render_template("cv.html")
     self.render_template("cvprint.html")
+    self.render_template("oscp.html")
+    self.render_template("research.html")
+    self.render_template("satview.html")
 
+    # default
+    self.render_template("index.html")
+    self.render_template("archive.html")
     self.datadict["tagcloud"] = self.tag_cloud()
     self.render_template("tags.html")
-
     self.datadict["stats"] = self.gen_stats()
     self.render_template("stats.html")
 
