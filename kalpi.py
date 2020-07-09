@@ -24,6 +24,7 @@ class Kalpi:
     self.postsdir = "%s/_posts" % (self.basedir)
     self.templatesdir = "%s/_templates" % (self.basedir)
     self.outputdir = self.basedir
+    self.statsdir = "%s/static/files/pages_stats" % (self.outputdir)
 
     self.templatemapping = {
       "index.html": "%s/index.html" % (self.outputdir),
@@ -285,13 +286,13 @@ class Kalpi:
     stats["summary"] = [self.md2html(x).replace("<p>", "").replace("</p>", "") for x in stats["summary"]]
 
     ppt = {tag:stats["groups"]["per_tag"][tag]["posts"] for tag in stats["groups"]["per_tag"]}
-    utils.to_xkcd(ppt, "%s/static/files/posts_per_tag.png" % (self.outputdir), "")
+    utils.to_xkcd(ppt, "%s/posts_per_tag.png" % (self.statsdir), "")
 
     ppy = {yyyy:stats["groups"]["per_yyyy"][yyyy]["posts"] for yyyy in stats["groups"]["per_yyyy"]}
-    utils.to_xkcd(ppy, "%s/static/files/posts_per_year.png" % (self.outputdir), "")
+    utils.to_xkcd(ppy, "%s/posts_per_year.png" % (self.statsdir), "")
 
     tpy = {yyyy:stats["groups"]["per_yyyy"][yyyy]["tags"] for yyyy in stats["groups"]["per_yyyy"]}
-    utils.to_xkcd(tpy, "%s/static/files/tags_per_year.png" % (self.outputdir), "")
+    utils.to_xkcd(tpy, "%s/tags_per_year.png" % (self.statsdir), "")
 
     return stats
 
