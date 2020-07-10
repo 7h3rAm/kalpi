@@ -519,7 +519,7 @@ def to_xkcd(plotdict, filename, title, rotate=True, trimlength=20):
   for key in plotdict:
     datadict[key] = [[key], [plotdict[key]]]
   with plt.xkcd():
-    for idx, label in enumerate(datadict):
+    for idx, label in enumerate(sorted(datadict)):
       plt.bar(datadict[label][0], datadict[label][1])
       text = "%s... (%d)" % ("".join(datadict[label][0][0][:trimlength]), datadict[label][1][0]) if len(label) >= trimlength else "%s (%d)" % (datadict[label][0][0], datadict[label][1][0])
       if rotate:
