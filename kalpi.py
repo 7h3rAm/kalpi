@@ -234,23 +234,29 @@ class Kalpi:
       if key not in stats["groups"]["per_yyyymm"]:
         stats["groups"]["per_yyyymm"][key] = {
           "posts": 1,
+          "tagslist": [],
           "tags": len(post["tags"]),
         }
       else:
         stats["groups"]["per_yyyymm"][key]
         stats["groups"]["per_yyyymm"][key]["posts"] += 1
         stats["groups"]["per_yyyymm"][key]["tags"] += len(post["tags"])
+        stats["groups"]["per_yyyymm"][key]["tagslist"] += post["tags"]
+        stats["groups"]["per_yyyymm"][key]["tagslist"] = list(set(stats["groups"]["per_yyyymm"][key]["tagslist"]))
 
       key = "%04d" % (post["year"])
       if key not in stats["groups"]["per_yyyy"]:
         stats["groups"]["per_yyyy"][key] = {
           "posts": 1,
+          "tagslist": [],
           "tags": len(post["tags"]),
         }
       else:
         stats["groups"]["per_yyyy"][key]
         stats["groups"]["per_yyyy"][key]["posts"] += 1
         stats["groups"]["per_yyyy"][key]["tags"] += len(post["tags"])
+        stats["groups"]["per_yyyy"][key]["tagslist"] += post["tags"]
+        stats["groups"]["per_yyyy"][key]["tagslist"] = list(set(stats["groups"]["per_yyyy"][key]["tagslist"]))
 
       for tag in post["tags"]:
         if tag not in stats["groups"]["per_tag"]:
@@ -266,8 +272,8 @@ class Kalpi:
     stats["max_posts_yyyy"] = max(stats["groups"]["per_yyyy"].keys(), key=(lambda key: stats["groups"]["per_yyyy"][key]["posts"]))
     stats["min_posts_yyyy"] = min(stats["groups"]["per_yyyy"].keys(), key=(lambda key: stats["groups"]["per_yyyy"][key]["posts"]))
 
-    stats["max_tags_yyyy"] = max(stats["groups"]["per_yyyy"].keys(), key=(lambda key: stats["groups"]["per_yyyy"][key]["tags"]))
-    stats["min_tags_yyyy"] = min(stats["groups"]["per_yyyy"].keys(), key=(lambda key: stats["groups"]["per_yyyy"][key]["tags"]))
+    stats["max_tags_yyyy"] = max(stats["groups"]["per_yyyy"].keys(), key=(lambda key: len(stats["groups"]["per_yyyy"][key]["tagslist"])))
+    stats["min_tags_yyyy"] = min(stats["groups"]["per_yyyy"].keys(), key=(lambda key: len(stats["groups"]["per_yyyy"][key]["tagslist"])))
 
     curdate = datetime.now()
     maxdate = datetime.strptime(max(stats["dates"]), "%Y%m%d")
@@ -279,10 +285,10 @@ class Kalpi:
     stats["summary"] = []
     stats["summary"].append("There are a total of `%d` posts with `%d` tags, written over a period of `%dy%dm%dd` (from `%s` till `%s`)" % (stats["count_posts"], stats["count_tags"], rd1.years, rd1.months, rd1.days, datetime.strftime(mindate, "%d/%b/%Y"), datetime.strftime(maxdate, "%d/%b/%Y")))
     stats["summary"].append("From the most recent update (on `%s`), it's been `%dy%dm%dd` when the last post was published and `%dy%dm%dd` since the first post" % (datetime.strftime(curdate, "%d/%b/%Y"), rd2.years, rd2.months, rd2.days, rd3.years, rd3.months, rd3.days))
-    stats["summary"].append("The year `%s` had highest number of posts with a count of `%d`, while the year `%s` had lowest number of posts with a count of `%d`" % (stats["max_posts_yyyy"], stats["groups"]["per_yyyy"][stats["max_posts_yyyy"]]["posts"], stats["min_posts_yyyy"], stats["groups"]["per_yyyy"][stats["min_posts_yyyy"]]["posts"]))
-    stats["summary"].append("The year `%s` had highest number of tags with a count of `%d`, while the year `%s` had lowest number of tags with a count of `%d`" % (stats["max_tags_yyyy"], stats["groups"]["per_yyyy"][stats["max_tags_yyyy"]]["tags"], stats["min_tags_yyyy"], stats["groups"]["per_yyyy"][stats["min_tags_yyyy"]]["tags"]))
+    stats["summary"].append("The year `%s` has highest number of posts with a count of `%d`, while the year `%s` has lowest number of posts with a count of `%d`" % (stats["max_posts_yyyy"], stats["groups"]["per_yyyy"][stats["max_posts_yyyy"]]["posts"], stats["min_posts_yyyy"], stats["groups"]["per_yyyy"][stats["min_posts_yyyy"]]["posts"]))
+    stats["summary"].append("The year `%s` has highest number of tags with a count of `%d`, while the year `%s` has lowest number of tags with a count of `%d`" % (stats["max_tags_yyyy"], len(stats["groups"]["per_yyyy"][stats["max_tags_yyyy"]]["tagslist"]), stats["min_tags_yyyy"], len(stats["groups"]["per_yyyy"][stats["min_tags_yyyy"]]["tagslist"])))
     stats["summary"].append("The most widely used of all `%d` tags across `%d` posts is `%s` while the least used is `%s`" % (stats["count_tags"], stats["count_posts"], stats["most_used_tag"], stats["least_used_tag"]))
-    stats["summary"].append("On an average, there are `%d` posts per tag and `%d` posts, `%d` tags per year" % (sum([stats["groups"]["per_tag"][x]["posts"] for x in stats["groups"]["per_tag"]])/len(stats["groups"]["per_tag"].keys()), sum([stats["groups"]["per_yyyy"][x]["posts"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys()), sum([stats["groups"]["per_yyyy"][x]["tags"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys())))
+    stats["summary"].append("On an average, there are `%d` posts per tag and `%d` posts, `%d` tags per year" % (sum([stats["groups"]["per_tag"][x]["posts"] for x in stats["groups"]["per_tag"]])/len(stats["groups"]["per_tag"].keys()), sum([stats["groups"]["per_yyyy"][x]["posts"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys()), sum([len(stats["groups"]["per_yyyy"][x]["tagslist"]) for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys())))
     stats["summary"] = [self.md2html(x).replace("<p>", "").replace("</p>", "") for x in stats["summary"]]
 
     ppt = {tag:stats["groups"]["per_tag"][tag]["posts"] for tag in stats["groups"]["per_tag"]}
@@ -291,7 +297,7 @@ class Kalpi:
     ppy = {yyyy:stats["groups"]["per_yyyy"][yyyy]["posts"] for yyyy in stats["groups"]["per_yyyy"]}
     utils.to_xkcd(ppy, "%s/posts_per_year.png" % (self.statsdir), "")
 
-    tpy = {yyyy:stats["groups"]["per_yyyy"][yyyy]["tags"] for yyyy in stats["groups"]["per_yyyy"]}
+    tpy = {yyyy:len(stats["groups"]["per_yyyy"][yyyy]["tagslist"]) for yyyy in stats["groups"]["per_yyyy"]}
     utils.to_xkcd(tpy, "%s/tags_per_year.png" % (self.statsdir), "")
 
     return stats
