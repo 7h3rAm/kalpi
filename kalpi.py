@@ -4,6 +4,7 @@ import os
 import re
 import time
 import random
+import htmlmin
 import markdown
 import dateutil.relativedelta
 from datetime import datetime
@@ -50,6 +51,9 @@ class Kalpi:
     self.relatedpostsstrategy = "tags_date"
     self.relatedpostsstrategy = "tags_random"
 
+    self.totalsize = 0
+    self.minsize = 0
+
     self.prep_datadict()
 
   def join_list(self, inlist, url="/tags.html#"):
@@ -91,8 +95,11 @@ class Kalpi:
   def render_template(self, templatefile):
     if templatefile in self.templatemapping:
       output = self.get_template(templatefile, datadict=self.datadict)
-      utils.file_save(self.templatemapping[templatefile], output)
-      utils.info("rendered '%s' (%sB)" % (utils.cyan(self.templatemapping[templatefile]), utils.blue(len(output))))
+      html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True)
+      utils.file_save(self.templatemapping[templatefile], html)
+      utils.info("rendered '%s' (%s)" % (utils.cyan(self.templatemapping[templatefile]), utils.blue(utils.sizeof_fmt(len(html)))))
+      self.totalsize += len(output)
+      self.minsize += len(html)
     else:
       utils.warn("could not find mapping for file '%s'" % (utils.red(templatefile)))
 
@@ -324,8 +331,11 @@ class Kalpi:
 
       filename = "%s%s" % (self.outputdir, post["url"])
       output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post})
-      utils.file_save(filename, output)
-      utils.info("rendered '%s' (%sB)" % (utils.magenta(filename), utils.blue(len(output))))
+      html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True)
+      utils.file_save(filename, html)
+      utils.info("rendered '%s' (%s)" % (utils.magenta(filename), utils.blue(utils.sizeof_fmt(len(html)))))
+      self.totalsize += len(output)
+      self.minsize += len(html)
 
     # posts
     self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
@@ -345,6 +355,7 @@ class Kalpi:
     self.datadict["stats"] = self.gen_stats()
     self.render_template("stats.html")
 
+    utils.info("size: total:%s, minified:%s, delta:%s" % (utils.sizeof_fmt(self.totalsize), utils.sizeof_fmt(self.minsize), utils.sizeof_fmt(self.totalsize-self.minsize)))
 
 if __name__ == "__main__":
   klp = Kalpi()

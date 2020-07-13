@@ -285,6 +285,14 @@ def sec_to_human(secs, sep=" and "):
       secs -= quot * divisor
   return sep.join(s)
 
+def sizeof_fmt(num, suffix='B'):
+  # https://stackoverflow.com/a/1094933/1079836
+  for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+    if abs(num) < 1024.0:
+      return "%3.1f%s%s" % (num, unit, suffix)
+    num /= 1024.0
+  return "%.1f%s%s" % (num, 'Yi', suffix)
+
 def customsort(items):
   return [str(y) for y in sorted([int(x) for x in items])]
 
