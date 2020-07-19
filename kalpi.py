@@ -21,6 +21,7 @@ class Kalpi:
     self.datadict["recent_count"] = 5
     self.basedir = "%s/toolbox/repos/7h3rAm.github.io" % (utils.expand_env(var="$HOME"))
     self.datadict["metadata"] = utils.load_yaml("%s/static/files/self.yml" % (self.basedir))["metadata"]
+    self.datadict["quotes"] = utils.load_yaml("%s/static/files/quotes.yml" % (self.basedir))["quotes"]
 
     self.postsdir = "%s/_posts" % (self.basedir)
     self.templatesdir = "%s/_templates" % (self.basedir)
@@ -36,7 +37,7 @@ class Kalpi:
       "tags.html": "%s/tags.html" % (self.outputdir),
       "stats.html": "%s/stats.html" % (self.outputdir),
       "oscp.html": "%s/oscp.html" % (self.outputdir),
-      "oscp2.html": "%s/oscp2.html" % (self.outputdir),
+      "quotes.html": "%s/quotes.html" % (self.outputdir),
       "cv.html": "%s/cv.html" % (self.outputdir),
       "cvprint.html": "%s/cvprint.html" % (self.outputdir),
     }
@@ -47,10 +48,6 @@ class Kalpi:
     self.postdateformat = "%d/%b/%Y"
 
     self.trimlength = 30
-    self.relatedpostscount = 3
-    self.relatedpostsstrategy = "tags_date"
-    self.relatedpostsstrategy = "tags_random"
-
     self.totalsize = 0
     self.minsize = 0
 
@@ -79,14 +76,18 @@ class Kalpi:
   def md2html(self, mdtext):
     return markdown.markdown(mdtext, extensions=["fenced_code", "footnotes", "tables"])
 
+  def remove_para(self, htmltext):
+    return htmltext.replace("<p>", "").replace("</p>", "")
+
   def prep_datadict(self):
     self.datadict["metadata"]["blog"]["intro"] = self.md2html(self.datadict["metadata"]["blog"]["intro"])
 
   def get_template(self, templatefile, datadict):
-    env = Environment(loader=FileSystemLoader(self.templatesdir), extensions=["jinja2_markdown.MarkdownExtension"])
+    env = Environment(loader=FileSystemLoader(self.templatesdir), extensions=["jinja2_markdown.MarkdownExtension"], autoescape=False)
     env.trim_blocks = True
     env.lsrtip_blocks = True
     env.filters["md2html"] = self.md2html
+    env.filters["removepara"] = self.remove_para
     env.filters["joinlist"] = self.join_list
     env.filters["joinlistand"] = self.join_list_and
     env.filters["trimlength"] = self.trim_length
@@ -344,6 +345,7 @@ class Kalpi:
     self.render_template("cv.html")
     self.render_template("cvprint.html")
     self.render_template("oscp.html")
+    self.render_template("quotes.html")
     self.render_template("research.html")
     self.render_template("satview.html")
 
