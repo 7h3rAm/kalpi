@@ -20,11 +20,17 @@ class Kalpi:
     self.datadict["posts"] = {}
     self.datadict["recent_count"] = 5
     self.basedir = "%s/toolbox/repos/7h3rAm.github.io" % (utils.expand_env(var="$HOME"))
-    self.datadict["metadata"] = utils.load_yaml("%s/static/files/self.yml" % (self.basedir))["metadata"]
-    self.datadict["quotes"] = utils.load_yaml("%s/static/files/quotes.yml" % (self.basedir))["quotes"]
+
+    self.datadict["metadata"] = utils.load_yaml("%s/toolbox/bootstrap/self.yml" % (utils.expand_env(var="$HOME")))["metadata"]
 
     self.postsdir = "%s/_posts" % (self.basedir)
     self.templatesdir = "%s/_templates" % (self.basedir)
+
+    self.datadict["pages"] = {}
+    self.pages = {}
+    self.pages["quotes"] = "%s/quotes.md" % (self.templatesdir)
+    self.pages["life"] = "%s/life.md" % (self.templatesdir)
+
     self.outputdir = self.basedir
     self.statsdir = "%s/static/files/pages_stats" % (self.outputdir)
 
@@ -38,6 +44,7 @@ class Kalpi:
       "stats.html": "%s/stats.html" % (self.outputdir),
       "oscp.html": "%s/oscp.html" % (self.outputdir),
       "quotes.html": "%s/quotes.html" % (self.outputdir),
+      "life.html": "%s/life.html" % (self.outputdir),
       "cv.html": "%s/cv.html" % (self.outputdir),
       "cvprint.html": "%s/cvprint.html" % (self.outputdir),
     }
@@ -345,9 +352,13 @@ class Kalpi:
     self.render_template("cv.html")
     self.render_template("cvprint.html")
     self.render_template("oscp.html")
-    self.render_template("quotes.html")
     self.render_template("research.html")
     self.render_template("satview.html")
+
+    self.datadict["pages"]["quotes"] = self.md2html(utils.file_open(self.pages["quotes"]))
+    self.render_template("quotes.html")
+    self.datadict["pages"]["life"] = self.md2html(utils.file_open(self.pages["life"]))
+    self.render_template("life.html")
 
     # default
     self.render_template("index.html")
