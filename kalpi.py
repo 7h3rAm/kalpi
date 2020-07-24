@@ -8,7 +8,7 @@ import htmlmin
 import markdown
 import dateutil.relativedelta
 from datetime import datetime
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, BaseLoader, FileSystemLoader
 
 import utils
 
@@ -28,8 +28,11 @@ class Kalpi:
 
     self.datadict["pages"] = {}
     self.pages = {}
+    self.pages["research"] = "%s/research.md" % (self.templatesdir)
     self.pages["quotes"] = "%s/quotes.md" % (self.templatesdir)
     self.pages["life"] = "%s/life.md" % (self.templatesdir)
+    self.pages["fitness"] = "%s/fitness.md" % (self.templatesdir)
+    self.pages["oscp"] = "%s/oscp.md" % (self.templatesdir)
 
     self.outputdir = self.basedir
     self.statsdir = "%s/static/files/pages_stats" % (self.outputdir)
@@ -37,16 +40,17 @@ class Kalpi:
     self.templatemapping = {
       "index.html": "%s/index.html" % (self.outputdir),
       "archive.html": "%s/archive.html" % (self.outputdir),
-      "research.html": "%s/research.html" % (self.outputdir),
-      "cv.html": "%s/cv.html" % (self.outputdir),
-      "satview.html": "%s/satview.html" % (self.outputdir),
       "tags.html": "%s/tags.html" % (self.outputdir),
       "stats.html": "%s/stats.html" % (self.outputdir),
-      "oscp.html": "%s/oscp.html" % (self.outputdir),
-      "quotes.html": "%s/quotes.html" % (self.outputdir),
-      "life.html": "%s/life.html" % (self.outputdir),
+
+      "research.html": "%s/research.html" % (self.outputdir),
       "cv.html": "%s/cv.html" % (self.outputdir),
       "cvprint.html": "%s/cvprint.html" % (self.outputdir),
+      "satview.html": "%s/satview.html" % (self.outputdir),
+      "quotes.html": "%s/quotes.html" % (self.outputdir),
+      "life.html": "%s/life.html" % (self.outputdir),
+      "fitness.html": "%s/fitness.html" % (self.outputdir),
+      "oscp.html": "%s/oscp.html" % (self.outputdir),
     }
 
     self.timeformat = "%B %-d, %Y"
@@ -83,8 +87,18 @@ class Kalpi:
   def md2html(self, mdtext):
     return markdown.markdown(mdtext, extensions=["fenced_code", "footnotes", "tables"])
 
+  def clean_text(self, rgx_list, text, subtext=""):
+    # https://stackoverflow.com/a/37192727/1079836
+    new_text = text
+    for rgx_match in rgx_list:
+      new_text = re.sub(rgx_match, subtext, new_text)
+    return new_text
+
   def remove_para(self, htmltext):
-    return htmltext.replace("<p>", "").replace("</p>", "")
+    return self.clean_text([r"<p>", r"</p>"], text=htmltext)
+
+  def remove_empty_ul(self, htmltext):
+    return self.clean_text([r"</li>\s*</ul>\s*<ul>\s*<li>"], text=htmltext, subtext="</li><li>")
 
   def prep_datadict(self):
     self.datadict["metadata"]["blog"]["intro"] = self.md2html(self.datadict["metadata"]["blog"]["intro"])
@@ -95,6 +109,7 @@ class Kalpi:
     env.lsrtip_blocks = True
     env.filters["md2html"] = self.md2html
     env.filters["removepara"] = self.remove_para
+    env.filters["removeemptyul"] = self.remove_empty_ul
     env.filters["joinlist"] = self.join_list
     env.filters["joinlistand"] = self.join_list_and
     env.filters["trimlength"] = self.trim_length
@@ -110,6 +125,12 @@ class Kalpi:
       self.minsize += len(html)
     else:
       utils.warn("could not find mapping for file '%s'" % (utils.red(templatefile)))
+
+  def render_template_string(self, templatestr):
+    env = Environment(loader=BaseLoader, extensions=["jinja2_markdown.MarkdownExtension"], autoescape=False).from_string(templatestr)
+    env.trim_blocks = True
+    env.lsrtip_blocks = True
+    return env.render(datadict=self.datadict)
 
   def tag_cloud(self):
     colors = ["#20b2aa", "#99cc99", "#0c9", "#5b92e5", "#ffcc66", "#00b7eb", "#69359c", "#fe4164", "#a50b5e"]
@@ -336,7 +357,6 @@ class Kalpi:
         post["next"] = {}
         post["next"]["title"] = posts[idx+1]["title"]
         post["next"]["url"] = posts[idx+1]["url"]
-
       filename = "%s%s" % (self.outputdir, post["url"])
       output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post})
       html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True)
@@ -349,16 +369,22 @@ class Kalpi:
     self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
 
     # pages
+    #self.render_template("research.html")
     self.render_template("cv.html")
     self.render_template("cvprint.html")
-    self.render_template("oscp.html")
-    self.render_template("research.html")
     self.render_template("satview.html")
+
+    self.datadict["pages"]["research"] = self.render_template_string(self.md2html(utils.file_open(self.pages["research"])))
+    self.render_template("research.html")
 
     self.datadict["pages"]["quotes"] = self.md2html(utils.file_open(self.pages["quotes"]))
     self.render_template("quotes.html")
     self.datadict["pages"]["life"] = self.md2html(utils.file_open(self.pages["life"]))
     self.render_template("life.html")
+    self.datadict["pages"]["fitness"] = self.md2html(utils.file_open(self.pages["fitness"]))
+    self.render_template("fitness.html")
+    self.datadict["pages"]["oscp"] = self.md2html(utils.file_open(self.pages["oscp"]))
+    self.render_template("oscp.html")
 
     # default
     self.render_template("index.html")
