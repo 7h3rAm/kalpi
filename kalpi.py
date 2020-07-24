@@ -29,6 +29,7 @@ class Kalpi:
     self.datadict["pages"] = {}
     self.pages = {}
     self.pages["research"] = "%s/research.md" % (self.templatesdir)
+    self.pages["cv"] = "%s/cv.md" % (self.templatesdir)
     self.pages["quotes"] = "%s/quotes.md" % (self.templatesdir)
     self.pages["life"] = "%s/life.md" % (self.templatesdir)
     self.pages["fitness"] = "%s/fitness.md" % (self.templatesdir)
@@ -98,7 +99,7 @@ class Kalpi:
     return self.clean_text([r"<p>", r"</p>"], text=htmltext)
 
   def remove_empty_ul(self, htmltext):
-    return self.clean_text([r"</li>\s*</ul>\s*<ul>\s*<li>"], text=htmltext, subtext="</li><li>")
+    return self.clean_text([r"</li>\s*</ul>\s*<ul>\s*<li>"], text=self.clean_text([r"<p>\s*</p>"], text=htmltext), subtext="</li><li>")
 
   def prep_datadict(self):
     self.datadict["metadata"]["blog"]["intro"] = self.md2html(self.datadict["metadata"]["blog"]["intro"])
@@ -127,10 +128,16 @@ class Kalpi:
       utils.warn("could not find mapping for file '%s'" % (utils.red(templatefile)))
 
   def render_template_string(self, templatestr):
-    env = Environment(loader=BaseLoader, extensions=["jinja2_markdown.MarkdownExtension"], autoescape=False).from_string(templatestr)
+    env = Environment(loader=BaseLoader, extensions=["jinja2_markdown.MarkdownExtension"], autoescape=False)
     env.trim_blocks = True
     env.lsrtip_blocks = True
-    return env.render(datadict=self.datadict)
+    env.filters["md2html"] = self.md2html
+    env.filters["removepara"] = self.remove_para
+    env.filters["removeemptyul"] = self.remove_empty_ul
+    env.filters["joinlist"] = self.join_list
+    env.filters["joinlistand"] = self.join_list_and
+    env.filters["trimlength"] = self.trim_length
+    return env.from_string(htmlmin.minify(templatestr, remove_comments=True, remove_empty_space=True)).render(datadict=self.datadict)
 
   def tag_cloud(self):
     colors = ["#20b2aa", "#99cc99", "#0c9", "#5b92e5", "#ffcc66", "#00b7eb", "#69359c", "#fe4164", "#a50b5e"]
@@ -339,6 +346,22 @@ class Kalpi:
     return stats
 
   def make(self):
+    # pages
+    self.datadict["pages"]["research"] = self.render_template_string(self.md2html(utils.file_open(self.pages["research"])))
+    self.render_template("research.html")
+    self.datadict["pages"]["cv"] = self.render_template_string(self.md2html(utils.file_open(self.pages["cv"])))
+    self.render_template("cv.html")
+    self.render_template("cvprint.html")
+    self.render_template("satview.html")
+    self.datadict["pages"]["quotes"] = self.md2html(utils.file_open(self.pages["quotes"]))
+    self.render_template("quotes.html")
+    self.datadict["pages"]["life"] = self.md2html(utils.file_open(self.pages["life"]))
+    self.render_template("life.html")
+    self.datadict["pages"]["fitness"] = self.md2html(utils.file_open(self.pages["fitness"]))
+    self.render_template("fitness.html")
+    self.datadict["pages"]["oscp"] = self.md2html(utils.file_open(self.pages["oscp"]))
+    self.render_template("oscp.html")
+
     posts = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=False)
     total = len(posts)
     for idx, post in enumerate(posts):
@@ -367,24 +390,6 @@ class Kalpi:
 
     # posts
     self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
-
-    # pages
-    #self.render_template("research.html")
-    self.render_template("cv.html")
-    self.render_template("cvprint.html")
-    self.render_template("satview.html")
-
-    self.datadict["pages"]["research"] = self.render_template_string(self.md2html(utils.file_open(self.pages["research"])))
-    self.render_template("research.html")
-
-    self.datadict["pages"]["quotes"] = self.md2html(utils.file_open(self.pages["quotes"]))
-    self.render_template("quotes.html")
-    self.datadict["pages"]["life"] = self.md2html(utils.file_open(self.pages["life"]))
-    self.render_template("life.html")
-    self.datadict["pages"]["fitness"] = self.md2html(utils.file_open(self.pages["fitness"]))
-    self.render_template("fitness.html")
-    self.datadict["pages"]["oscp"] = self.md2html(utils.file_open(self.pages["oscp"]))
-    self.render_template("oscp.html")
 
     # default
     self.render_template("index.html")
