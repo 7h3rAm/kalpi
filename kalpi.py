@@ -121,7 +121,7 @@ class Kalpi:
       output = self.get_template(templatefile, datadict=self.datadict)
 
       if "collapsible" in postprocess:
-        output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p', '<p class="nested"')
+        output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">')
       output = output.replace('<div class="footer"></div>', '<div class=footer><p><a href=https://creativecommons.org/licenses/by-sa/4.0/ rel=license><img src=/static/files/ccbysa4.svg></a></p></div>')
       html = output
       if "minify" in postprocess:
@@ -357,9 +357,6 @@ class Kalpi:
     self.datadict["pages"]["research"] = self.render_template_string(self.md2html(utils.file_open(self.pages["research"])))
     self.render_template("research.html", postprocess=postprocess)
     self.datadict["pages"]["cv"] = self.render_template_string(self.md2html(utils.file_open(self.pages["cv"])))
-    self.render_template("cv.html", postprocess=postprocess)
-    self.render_template("cvprint.html", postprocess=postprocess)
-    self.render_template("satview.html")
     self.datadict["pages"]["quotes"] = self.md2html(utils.file_open(self.pages["quotes"]))
     self.render_template("quotes.html", postprocess=postprocess)
     self.datadict["pages"]["life"] = self.md2html(utils.file_open(self.pages["life"]))
@@ -368,8 +365,13 @@ class Kalpi:
     self.render_template("fitness.html", postprocess=postprocess)
     self.datadict["pages"]["oscp"] = self.md2html(utils.file_open(self.pages["oscp"]))
     self.render_template("oscp.html")
+    self.render_template("cv.html")
+    self.render_template("cvprint.html")
+    self.render_template("satview.html")
 
+    # posts
     posts = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=False)
+    self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
     total = len(posts)
     for idx, post in enumerate(posts):
       if idx == 0:
@@ -387,23 +389,18 @@ class Kalpi:
         post["next"] = {}
         post["next"]["title"] = posts[idx+1]["title"]
         post["next"]["url"] = posts[idx+1]["url"]
-
       filename = "%s%s" % (self.outputdir, post["url"])
       output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post})
       if "collapsible" in postprocess:
-        output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p', '<p class="nested"').replace('<p class="nested active" re=""><code>', '<p re=""><code>')
+        output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">').replace('<pre><code>', '<pre class="nested"><code>').replace('<pre><code class="','<pre class="nested"><code class="').replace('<p class="nested"><a href="/posts/', '<p><a href="/posts/')
       output = output.replace('<div class="footer"></div>', '<div class=footer><p><a href=https://creativecommons.org/licenses/by-sa/4.0/ rel=license><img src=/static/files/ccbysa4.svg></a></p></div>')
       html = output
       if "minify" in postprocess:
         html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True)
       utils.file_save(filename, html)
-
       utils.info("rendered '%s' (%s)" % (utils.magenta(filename), utils.blue(utils.sizeof_fmt(len(html)))))
       self.totalsize += len(output)
       self.minsize += len(html)
-
-    # posts
-    self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
 
     # default
     self.render_template("index.html")
