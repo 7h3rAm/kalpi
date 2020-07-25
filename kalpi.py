@@ -352,7 +352,9 @@ class Kalpi:
 
     return stats
 
-  def make(self, postprocess=["collapsible"]):
+  def make(self):
+    postprocess = ["collapsible", "minify"]
+
     # pages
     self.datadict["pages"]["research"] = self.render_template_string(self.md2html(utils.file_open(self.pages["research"])))
     self.render_template("research.html", postprocess=postprocess)
@@ -365,9 +367,9 @@ class Kalpi:
     self.render_template("fitness.html", postprocess=postprocess)
     self.datadict["pages"]["oscp"] = self.md2html(utils.file_open(self.pages["oscp"]))
     self.render_template("oscp.html", postprocess=postprocess)
-    self.render_template("cv.html")
-    self.render_template("cvprint.html")
-    self.render_template("satview.html")
+    self.render_template("cv.html", postprocess=["minify"])
+    self.render_template("cvprint.html", postprocess=["minify"])
+    self.render_template("satview.html", postprocess=["minify"])
 
     # posts
     posts = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=False)
@@ -394,23 +396,28 @@ class Kalpi:
       if "collapsible" in postprocess:
         output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">').replace('<pre><code>', '<pre class="nested"><code>').replace('<pre><code class="','<pre class="nested"><code class="').replace('<p class="nested"><a href="/posts/', '<p><a href="/posts/')
       output = output.replace('<div class="footer"></div>', '<div class=footer><p><a href=https://creativecommons.org/licenses/by-sa/4.0/ rel=license><img src=/static/files/ccbysa4.svg></a></p></div>')
-      html = output
-      if "minify" in postprocess:
-        html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True)
+      html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True) if "minify" in postprocess else output
       utils.file_save(filename, html)
       utils.info("rendered '%s' (%s)" % (utils.magenta(filename), utils.blue(utils.sizeof_fmt(len(html)))))
       self.totalsize += len(output)
       self.minsize += len(html)
 
     # default
-    self.render_template("index.html")
-    self.render_template("archive.html")
+    self.render_template("index.html", postprocess=["minify"])
+    self.render_template("archive.html", postprocess=["minify"])
     self.datadict["tagcloud"] = self.tag_cloud()
-    self.render_template("tags.html")
+    self.render_template("tags.html", postprocess=["minify"])
     self.datadict["stats"] = self.gen_stats()
-    self.render_template("stats.html")
+    self.render_template("stats.html", postprocess=["minify"])
 
-    utils.info("size: total:%s, minified:%s, delta:%s" % (utils.sizeof_fmt(self.totalsize), utils.sizeof_fmt(self.minsize), utils.sizeof_fmt(self.totalsize-self.minsize)))
+    utils.info("size: total:%s (%d), minified:%s (%d), delta:%s (%d)" % (
+      utils.sizeof_fmt(self.totalsize),
+      self.totalsize,
+      utils.sizeof_fmt(self.minsize),
+      self.minsize,
+      utils.sizeof_fmt(self.totalsize-self.minsize),
+      self.totalsize-self.minsize
+    ))
 
 if __name__ == "__main__":
   klp = Kalpi()
