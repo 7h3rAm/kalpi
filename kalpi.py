@@ -364,7 +364,7 @@ class Kalpi:
     self.datadict["pages"]["fitness"] = self.md2html(utils.file_open(self.pages["fitness"]))
     self.render_template("fitness.html", postprocess=postprocess)
     self.datadict["pages"]["oscp"] = self.md2html(utils.file_open(self.pages["oscp"]))
-    self.render_template("oscp.html")
+    self.render_template("oscp.html", postprocess=postprocess)
     self.render_template("cv.html")
     self.render_template("cvprint.html")
     self.render_template("satview.html")
