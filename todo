@@ -1,7 +1,9 @@
 
-auto update:
-  re-create every day @ 0000
-  gcp
+https://www.maxlaumeister.com/pagecrypt/
+https://robinmoisson.github.io/staticrypt/
+
+custom 404 page
+custom domain
 
 stats:
   self:
@@ -11,5 +13,3 @@ stats:
     hackthebox:
     vulnhub:
     tryhackme:
-  mannthan:
-    blog stats
