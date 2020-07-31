@@ -30,7 +30,6 @@ class Kalpi:
     self.pages = {}
     self.pages["research"] = "%s/research.md" % (self.templatesdir)
     self.pages["cv"] = "%s/cv.md" % (self.templatesdir)
-    self.pages["quotes"] = "%s/quotes.md" % (self.templatesdir)
     self.pages["life"] = "%s/life.md" % (self.templatesdir)
     self.pages["fitness"] = "%s/fitness.md" % (self.templatesdir)
     self.pages["oscp"] = "%s/oscp.md" % (self.templatesdir)
@@ -48,7 +47,6 @@ class Kalpi:
       "cv.html": "%s/cv.html" % (self.outputdir),
       "cvprint.html": "%s/cvprint.html" % (self.outputdir),
       "satview.html": "%s/satview.html" % (self.outputdir),
-      "quotes.html": "%s/quotes.html" % (self.outputdir),
       "life.html": "%s/life.html" % (self.outputdir),
       "fitness.html": "%s/fitness.html" % (self.outputdir),
       "oscp.html": "%s/oscp.html" % (self.outputdir),
@@ -359,8 +357,6 @@ class Kalpi:
     self.datadict["pages"]["research"] = self.render_template_string(self.md2html(utils.file_open(self.pages["research"])))
     self.render_template("research.html", postprocess=postprocess)
     self.datadict["pages"]["cv"] = self.render_template_string(self.md2html(utils.file_open(self.pages["cv"])))
-    self.datadict["pages"]["quotes"] = self.md2html(utils.file_open(self.pages["quotes"]))
-    self.render_template("quotes.html", postprocess=postprocess)
     self.datadict["pages"]["life"] = self.md2html(utils.file_open(self.pages["life"]))
     self.render_template("life.html", postprocess=postprocess)
     self.datadict["pages"]["fitness"] = self.md2html(utils.file_open(self.pages["fitness"]))
