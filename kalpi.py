@@ -120,7 +120,7 @@ class Kalpi:
 
       if "collapsible" in postprocess:
         output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">')
-      output = output.replace('<div class="footer"></div>', '<div class=footer><p><a href=https://creativecommons.org/licenses/by-sa/4.0/ rel=license><img src=/static/files/ccbysa4.svg></a></p></div>')
+      output = output.replace('<div class="footer"></div>', '<div class="footer"><p><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license"><img src="/static/files/ccbysa4.svg"></a></p></div>')
       html = output
       if "minify" in postprocess:
         html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True)
@@ -391,7 +391,7 @@ class Kalpi:
       output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post})
       if "collapsible" in postprocess:
         output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">').replace('<pre><code>', '<pre class="nested"><code>').replace('<pre><code class="','<pre class="nested"><code class="').replace('<p class="nested"><a href="/posts/', '<p><a href="/posts/')
-      output = output.replace('<div class="footer"></div>', '<div class=footer><p><a href=https://creativecommons.org/licenses/by-sa/4.0/ rel=license><img src=/static/files/ccbysa4.svg></a></p></div>')
+      output = output.replace('<div class="footer"></div>', '<div class="footer"><p><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license"><img src="/static/files/ccbysa4.svg"></a></p></div>')
       html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True) if "minify" in postprocess else output
       utils.file_save(filename, html)
       utils.info("rendered '%s' (%s)" % (utils.magenta(filename), utils.blue(utils.sizeof_fmt(len(html)))))
