@@ -18,7 +18,7 @@ class Kalpi:
     self.datadict = {}
     self.datadict["tags"] = {}
     self.datadict["posts"] = {}
-    self.datadict["recent_count"] = 5
+    self.datadict["recent_count"] = 3
     self.basedir = "%s/toolbox/repos/7h3rAm.github.io" % (utils.expand_env(var="$HOME"))
 
     self.datadict["metadata"] = utils.load_yaml("%s/toolbox/bootstrap/self.yml" % (utils.expand_env(var="$HOME")))["metadata"]
