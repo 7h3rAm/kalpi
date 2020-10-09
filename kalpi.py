@@ -5,6 +5,7 @@ import re
 import time
 import random
 import htmlmin
+import argparse
 import markdown
 import dateutil.relativedelta
 from datetime import datetime
@@ -16,6 +17,23 @@ import utils
 class Kalpi:
   def __init__(self):
     self.datadict = {}
+
+    self.datadict["themes"] = {
+      "rainbow": "style.rainbow.css",
+      "plaintext": "style.plaintext.css",
+    }
+    self.datadict["theme"] = "rainbow"
+    self.datadict["themefile"] = self.datadict["themes"][self.datadict["theme"]]
+
+    self.datadict["bgcolors"] = {
+      "index": "#fff5ee",
+      "archive": "#eef8f1",
+      "tags": "#fff0f5",
+      "stats": "#f3f3fd",
+      "posts": "#ffffff",
+    }
+    self.datadict["bgcolor"] = self.datadict["bgcolors"]["posts"]
+
     self.datadict["tags"] = {}
     self.datadict["posts"] = {}
     self.datadict["recent_count"] = 5
@@ -350,7 +368,17 @@ class Kalpi:
 
     return stats
 
-  def make(self):
+  def make(self, args):
+    if args.theme:
+      args.theme = args.theme.lower().strip()
+      if args.theme in ["rainbow", "plaintext"]:
+        self.datadict["theme"] = args.theme
+        self.datadict["themefile"] = self.datadict["themes"][self.datadict["theme"]]
+      else:
+        utils.warn("theme '%s' not found" % (args.theme))
+
+    utils.info("using '%s (%s)' for blog theme" % (self.datadict["theme"], self.datadict["themefile"]))
+
     postprocess = ["collapsible", "minify"]
 
     # pages
@@ -388,7 +416,8 @@ class Kalpi:
         post["next"]["title"] = posts[idx+1]["title"]
         post["next"]["url"] = posts[idx+1]["url"]
       filename = "%s%s" % (self.outputdir, post["url"])
-      output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post})
+      self.datadict["bgcolor"] = self.datadict["bgcolors"]["posts"]
+      output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post, "themefile": self.datadict["themefile"], "bgcolor": self.datadict["bgcolor"]})
       if "collapsible" in postprocess:
         output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">').replace('<pre><code>', '<pre class="nested"><code>').replace('<pre><code class="','<pre class="nested"><code class="').replace('<p class="nested"><a href="/posts/', '<p><a href="/posts/')
       output = output.replace('<div class="footer"></div>', '<div class="footer"><p><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license"><img src="/static/files/ccbysa4.svg"></a></p></div>')
@@ -399,11 +428,15 @@ class Kalpi:
       self.minsize += len(html)
 
     # default
+    self.datadict["bgcolor"] = self.datadict["bgcolors"]["index"]
     self.render_template("index.html", postprocess=["minify"])
+    self.datadict["bgcolor"] = self.datadict["bgcolors"]["archive"]
     self.render_template("archive.html", postprocess=["minify"])
     self.datadict["tagcloud"] = self.tag_cloud()
+    self.datadict["bgcolor"] = self.datadict["bgcolors"]["tags"]
     self.render_template("tags.html", postprocess=["minify"])
     self.datadict["stats"] = self.gen_stats()
+    self.datadict["bgcolor"] = self.datadict["bgcolors"]["stats"]
     self.render_template("stats.html", postprocess=["minify"])
 
     utils.info("size: total:%s (%d), minified:%s (%d), delta:%s (%d)" % (
@@ -416,5 +449,9 @@ class Kalpi:
     ))
 
 if __name__ == "__main__":
+  parser = argparse.ArgumentParser(description="%s (v%s)" % (utils.blue_bold("kalpi"), utils.green_bold("0.1")))
+  parser.add_argument('-t', '--theme', required=False, action='store', help='override default theme file (allowed values: rainbow, plaintext)')
+  args = parser.parse_args()
+
   klp = Kalpi()
-  klp.make()
+  klp.make(args)
