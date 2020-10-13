@@ -31,6 +31,7 @@ class Kalpi:
       "tags": "#fff0f5",
       "stats": "#f3f3fd",
       "posts": "#ffffff",
+      "pages": "#ffffff",
     }
     self.datadict["bgcolor"] = self.datadict["bgcolors"]["posts"]
 
@@ -61,13 +62,14 @@ class Kalpi:
       "tags.html": "%s/tags.html" % (self.outputdir),
       "stats.html": "%s/stats.html" % (self.outputdir),
 
-      "research.html": "%s/research.html" % (self.outputdir),
-      "cv.html": "%s/cv.html" % (self.outputdir),
-      "cvprint.html": "%s/cvprint.html" % (self.outputdir),
-      "satview.html": "%s/satview.html" % (self.outputdir),
-      "life.html": "%s/life.html" % (self.outputdir),
-      "fitness.html": "%s/fitness.html" % (self.outputdir),
-      "oscp.html": "%s/oscp.html" % (self.outputdir),
+      # pages
+      "research.html": "%s/pages/research.html" % (self.outputdir),
+      "cv.html": "%s/pages/cv.html" % (self.outputdir),
+      "cvprint.html": "%s/pages/cvprint.html" % (self.outputdir),
+      "satview.html": "%s/pages/satview.html" % (self.outputdir),
+      "life.html": "%s/pages/life.html" % (self.outputdir),
+      "fitness.html": "%s/pages/fitness.html" % (self.outputdir),
+      "oscp.html": "%s/pages/oscp.html" % (self.outputdir),
     }
 
     self.timeformat = "%B %-d, %Y"
