@@ -140,7 +140,7 @@ class Kalpi:
 
       if "collapsible" in postprocess:
         output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">')
-      output = output.replace('<div class="footer"></div>', '<div class="footer"><p><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license"><img src="/static/files/ccbysa4.svg"></a></p></div>')
+      output = output.replace('<div class="footer"></div>', '<div class="footer"><p><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license"><img alt="License: CC BY-SA 4.0" src="/static/files/ccbysa4.svg"></a></p></div>')
       html = output
       if "minify" in postprocess:
         html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True)
