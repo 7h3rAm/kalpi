@@ -386,16 +386,21 @@ class Kalpi:
 
     # pages
     self.datadict["pages"]["research"] = self.render_template_string(self.md2html(utils.file_open(self.pages["research"])))
-    self.render_template("research.html", postprocess=postprocess)
+    self.render_template("research.html", postprocess=["collapsible", "minify"])
+
     self.datadict["pages"]["cv"] = self.render_template_string(self.md2html(utils.file_open(self.pages["cv"])))
-    self.datadict["pages"]["life"] = self.md2html(utils.file_open(self.pages["life"]))
-    self.render_template("life.html", postprocess=postprocess)
-    self.datadict["pages"]["fitness"] = self.md2html(utils.file_open(self.pages["fitness"]))
-    self.render_template("fitness.html", postprocess=postprocess)
-    self.datadict["pages"]["oscp"] = self.md2html(utils.file_open(self.pages["oscp"]))
-    self.render_template("oscp.html", postprocess=postprocess)
     self.render_template("cv.html", postprocess=["minify"])
     self.render_template("cvprint.html", postprocess=["minify"])
+
+    self.datadict["pages"]["life"] = self.md2html(utils.file_open(self.pages["life"]))
+    self.render_template("life.html", postprocess=["collapsible", "minify"])
+
+    self.datadict["pages"]["fitness"] = self.md2html(utils.file_open(self.pages["fitness"]))
+    self.render_template("fitness.html", postprocess=["collapsible", "minify"])
+
+    self.datadict["pages"]["oscp"] = self.md2html(utils.file_open(self.pages["oscp"]))
+    self.render_template("oscp.html", postprocess=["collapsible", "minify"])
+
     self.render_template("satview.html", postprocess=["minify"])
 
     # posts
