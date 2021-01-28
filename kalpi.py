@@ -100,7 +100,7 @@ class Kalpi:
       return set2
 
   def trim_length(self, text):
-    return "".join([text[:self.trimlength], "..."])
+    return "".join([text[:self.trimlength], "..."]) if len(text) > self.trimlength else text
 
   def md2html(self, mdtext):
     return markdown.markdown(mdtext, extensions=["fenced_code", "footnotes", "tables"])
