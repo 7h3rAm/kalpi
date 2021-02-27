@@ -382,6 +382,7 @@ class Kalpi:
     self.render_template("startpage.html", postprocess=postprocess)
 
     # posts
+    calist = [x.replace(self.basedir, "") for x in utils.search_files_all("%s/static/images/clipart" % (self.basedir))]
     posts = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=False)
     self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
     total = len(posts)
@@ -404,7 +405,8 @@ class Kalpi:
       filename = "%s%s" % (self.outputdir, post["url"])
       self.datadict["bgcolor"] = self.datadict["bgcolors"]["posts"]
       output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post, "themefile": self.datadict["themefile"], "bgcolor": self.datadict["bgcolor"]})
-      output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">').replace('<pre><code>', '<pre class="nested"><code>').replace('<pre><code class="','<pre class="nested"><code class="').replace('<p class="nested"><a href="/posts/', '<p><a href="/posts/').replace('<p class="nested">📅 published on ', '<p>📅 published on ')
+      output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">').replace('<pre><code>', '<pre class="nested"><code>').replace('<pre><code class="','<pre class="nested"><code class="').replace('<p class="nested"><a href="/posts/', '<p><a href="/posts/').replace('<p class="nested">📅 published on ', '<p>📅 published on ').replace('<p class="nested">🔖 tagged ', '<p>🔖 tagged ')
+      #output = output.replace('BG_CLIPART_STYLE_HERE', 'class="bgclipart_sq" style="background-image: url(%s);"' % (random.choice(calist)))
       html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True) if "minify" in postprocess else output
       utils.file_save(filename, html)
       utils.info("rendered '%s' (%s)" % (utils.magenta(filename), utils.blue(utils.sizeof_fmt(len(html)))))
