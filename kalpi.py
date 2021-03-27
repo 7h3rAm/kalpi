@@ -26,16 +26,6 @@ class Kalpi:
     self.datadict["theme"] = "invisibletree"
     self.datadict["themefile"] = self.datadict["themes"][self.datadict["theme"]]
 
-    self.datadict["bgcolors"] = {
-      "index": "#fff5ee",
-      "archive": "#eef8f1",
-      "tags": "#fff0f5",
-      "stats": "#f3f3fd",
-      "posts": "#ffffff",
-      "pages": "#ffffff",
-    }
-    self.datadict["bgcolor"] = self.datadict["bgcolors"]["posts"]
-
     self.datadict["tags"] = {}
     self.datadict["posts"] = {}
     self.datadict["recent_count"] = 5
@@ -363,23 +353,7 @@ class Kalpi:
     return stats
 
   def make(self, args, postprocess=[]):
-    if args.theme:
-      args.theme = args.theme.lower().strip()
-      if args.theme in ["rainbow", "plaintext"]:
-        self.datadict["theme"] = args.theme
-        self.datadict["themefile"] = self.datadict["themes"][self.datadict["theme"]]
-      else:
-        utils.warn("theme '%s' not found" % (args.theme))
     utils.info("using '%s (%s)' for blog theme" % (self.datadict["theme"], self.datadict["themefile"]))
-
-    # pages
-    self.render_template("cv.html", postprocess=postprocess)
-    self.render_template("fitness.html", postprocess=postprocess)
-    self.render_template("life.html", postprocess=postprocess)
-    self.render_template("oscp.html", postprocess=postprocess)
-    self.render_template("research.html", postprocess=postprocess)
-    self.render_template("satview.html", postprocess=postprocess)
-    self.render_template("startpage.html", postprocess=postprocess)
 
     # posts
     calist = [x.replace(self.basedir, "") for x in utils.search_files_all("%s/static/images/clipart" % (self.basedir))]
@@ -403,15 +377,23 @@ class Kalpi:
         post["next"]["title"] = posts[idx+1]["title"]
         post["next"]["url"] = posts[idx+1]["url"]
       filename = "%s%s" % (self.outputdir, post["url"])
-      self.datadict["bgcolor"] = self.datadict["bgcolors"]["posts"]
-      output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post, "themefile": self.datadict["themefile"], "bgcolor": self.datadict["bgcolor"]})
-      output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">').replace('<pre><code>', '<pre class="nested"><code>').replace('<pre><code class="','<pre class="nested"><code class="').replace('<p class="nested"><a href="/posts/', '<p><a href="/posts/').replace('<p class="nested">📅 published on ', '<p>📅 published on ').replace('<p class="nested">🔖 tagged ', '<p>🔖 tagged ')
+      output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post, "tags": self.datadict["tags"], "themefile": self.datadict["themefile"]})
+      output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<br/><h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<h5>', '<h5 class="h5 collapsible" onclick="toggle(this);">').replace('<h6>', '<h6 class="h6 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested">').replace('<ol>', '<ol class="nested">').replace('<p>', '<p class="nested">').replace('<pre><code>', '<pre class="nested"><code>').replace('<pre><code class="','<pre class="nested"><code class="').replace('<p class="nested"><a href="/posts/', '<p><a href="/posts/').replace('<p class="nested">📅 published on ', '<p>📅 published on ').replace('<p class="nested">🔖 tagged ', '<p>🔖 tagged ')
       #output = output.replace('BG_CLIPART_STYLE_HERE', 'class="bgclipart_sq" style="background-image: url(%s);"' % (random.choice(calist)))
       html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True) if "minify" in postprocess else output
       utils.file_save(filename, html)
       utils.info("rendered '%s' (%s)" % (utils.magenta(filename), utils.blue(utils.sizeof_fmt(len(html)))))
       self.totalsize += len(output)
       self.minsize += len(html)
+
+    # pages
+    self.render_template("cv.html", postprocess=postprocess)
+    self.render_template("fitness.html", postprocess=postprocess)
+    self.render_template("life.html", postprocess=postprocess)
+    self.render_template("oscp.html", postprocess=postprocess)
+    self.render_template("research.html", postprocess=postprocess)
+    self.render_template("satview.html", postprocess=postprocess)
+    self.render_template("startpage.html", postprocess=postprocess)
 
     # default
     self.render_template("index.html", postprocess=postprocess)
@@ -432,7 +414,6 @@ class Kalpi:
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description="%s (v%s)" % (utils.blue_bold("kalpi"), utils.green_bold("0.1")))
-  parser.add_argument('-t', '--theme', required=False, action='store', help='override default theme file (allowed values: rainbow, plaintext)')
   args = parser.parse_args()
 
   klp = Kalpi()
