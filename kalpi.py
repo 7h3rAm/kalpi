@@ -4,9 +4,11 @@ import os
 import re
 import time
 import random
+import hashlib
 import htmlmin
 import argparse
 import markdown
+import sparkline
 import dateutil.relativedelta
 from datetime import datetime
 from jinja2 import Environment, BaseLoader, FileSystemLoader
@@ -201,6 +203,29 @@ class Kalpi:
         break
     return date, summary, tags, content
 
+  def sparkify(self, content, maxsize=10, unique=True, sparkmode=True):
+    sparkid = hashlib.sha256(content.encode("utf-8")).hexdigest()
+    spark = "".join(sparkline.sparkify([int(x, base=16) for x in sparkid]))
+    colors = ["#007bff", "#00bcd4", "#17a2b8", "#20c997", "#2196f3", "#28a745", "#4caf50", "#6610f2", "#6c757d", "#6f42c1", "#8357ff", "#dc3545", "#e83e8c", "#f44336", "#fd7e14", "#ffc107", "#20b2aa", "#99cc99", "#0c9", "#5b92e5", "#ffcc66", "#00b7eb", "#69359c", "#fe4164", "#a50b5e"]
+    charmap = {
+      "▁": "◐",
+      "▂": "■",
+      "▃": "◩",
+      "▄": "◆",
+      "▅": "◢",
+      "▆": "◨",
+      "▇": "●",
+      "█": "▲",
+    }
+    if unique:
+      sparkcolored = "".join(['<span style="color:%s;">%s</span>' % (random.choice(colors), ch if sparkmode else charmap[ch]) for ch in spark[:maxsize]])
+      sparkcoloredlong = "".join(['<span style="color:%s;">%s</span>' % (random.choice(colors), ch if sparkmode else charmap[ch]) for ch in spark])
+    else:
+      chars = ["▣", "►", "◐", "◧", "▤", "▼", "◑", "◨", "▥", "◀", "◒", "◩", "▦", "◆", "◕", "◪", "▧", "◈", "◢", "■", "▨", "◉", "◣", "▩", "◎", "◤", "▲", "●", "◥"]
+      sparkcolored = "".join(['<span style="color:%s;">%s</span>' % (random.choice(colors), random.choice(chars)) for _ in range(len(sparkid[:maxsize]))])
+      sparkcoloredlong = "".join(['<span style="color:%s;">%s</span>' % (random.choice(colors), random.choice(chars)) for _ in range(len(sparkid))])
+    return ('<span title="%s" class="sparklines">%s</span>' % (sparkid, sparkcolored), '<span title="%s" class="sparklines">%s</span>' % (sparkid, sparkcoloredlong))
+
   def get_tree(self, source):
     posts = []
     self.datadict["tags"] = dict()
@@ -217,6 +242,8 @@ class Kalpi:
           pretty_date = time.strftime(self.postdateformat, date)
           epoch = time.mktime(date)
           url = "/posts/%d%02d%02d_%s.html" % (year, month, day, os.path.splitext(name)[0])
+          sparkcolored, sparkcoloredlong = self.sparkify("\n".join(contentmd))
+
           post = {
             "title": title,
             "epoch": epoch,
@@ -232,6 +259,8 @@ class Kalpi:
             "tags": tags,
             "summary": summary,
             "filename": name,
+            "sparkline": sparkcolored,
+            "sparklinelong": sparkcoloredlong,
             "previous": None,
             "next": None,
           }
@@ -240,6 +269,8 @@ class Kalpi:
             if tag not in self.datadict["tags"].keys():
               self.datadict["tags"][tag] = [{
                 "title": title,
+                "sparkline": sparkcolored,
+                "sparklinelong": sparkcoloredlong,
                 "url": url,
                 "pretty_date": pretty_date,
                 "year": year,
@@ -249,6 +280,8 @@ class Kalpi:
             else:
               self.datadict["tags"][tag].append({
                 "title": title,
+                "sparkline": sparkcolored,
+                "sparklinelong": sparkcoloredlong,
                 "url": url,
                 "pretty_date": pretty_date,
                 "year": year,
@@ -396,11 +429,11 @@ class Kalpi:
     self.render_template("startpage.html", postprocess=postprocess)
 
     # default
+    self.datadict["stats"] = self.gen_stats()
+    self.datadict["tagcloud"] = self.tag_cloud()
     self.render_template("index.html", postprocess=postprocess)
     self.render_template("archive.html", postprocess=postprocess)
-    self.datadict["tagcloud"] = self.tag_cloud()
     self.render_template("tags.html", postprocess=postprocess)
-    self.datadict["stats"] = self.gen_stats()
     self.render_template("stats.html", postprocess=postprocess)
 
     utils.info("size: total:%s (%d), minified:%s (%d), delta:%s (%d)" % (
