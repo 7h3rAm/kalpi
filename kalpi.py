@@ -224,7 +224,7 @@ class Kalpi:
       chars = ["▣", "►", "◐", "◧", "▤", "▼", "◑", "◨", "▥", "◀", "◒", "◩", "▦", "◆", "◕", "◪", "▧", "◈", "◢", "■", "▨", "◉", "◣", "▩", "◎", "◤", "▲", "●", "◥"]
       sparkcolored = "".join(['<span style="color:%s;">%s</span>' % (random.choice(colors), random.choice(chars)) for _ in range(len(sparkid[:maxsize]))])
       sparkcoloredlong = "".join(['<span style="color:%s;">%s</span>' % (random.choice(colors), random.choice(chars)) for _ in range(len(sparkid))])
-    return ('<span title="%s" class="sparklines">%s</span>' % (sparkid, sparkcolored), '<span title="%s" class="sparklines">%s</span>' % (sparkid, sparkcoloredlong))
+    return ('<span class="sparklines">%s</span>' % (sparkcolored), '<span class="sparklines">%s</span>' % (sparkcoloredlong))
 
   def get_tree(self, source):
     posts = []
