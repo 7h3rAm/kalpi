@@ -20,14 +20,6 @@ class Kalpi:
   def __init__(self):
     self.datadict = {}
 
-    self.datadict["themes"] = {
-      "rainbow": "style.rainbow.css",
-      "plaintext": "style.plaintext.css",
-      "invisibletree": "style.invisibletree.css",
-    }
-    self.datadict["theme"] = "invisibletree"
-    self.datadict["themefile"] = self.datadict["themes"][self.datadict["theme"]]
-
     self.datadict["tags"] = {}
     self.datadict["posts"] = {}
     self.datadict["recent_count"] = 10
@@ -93,6 +85,9 @@ class Kalpi:
 
   def trim_length(self, text):
     return "".join([text[:self.trimlength], "..."]) if len(text) > self.trimlength else text
+
+  def preprocess_text(self, mdtext):
+    return mdtext.replace('\n```\n', '\n```c\n') if "\n```\n" in mdtext else mdtext
 
   def md2html(self, mdtext):
     return markdown.markdown(mdtext, extensions=["fenced_code", "footnotes", "tables"])
@@ -200,6 +195,7 @@ class Kalpi:
           tags.append(tag.replace(" ", "_"))
       if line == "\n":
         content = self.md2html("".join(lines[idx+1:]))
+        print(content)
         break
     return date, summary, tags, content
 
@@ -236,7 +232,7 @@ class Kalpi:
         path = os.path.join(root, name)
         with open(path, "r") as f:
           title = f.readline()[:-1].strip("\n..")
-          contentmd = f.readlines()
+          contentmd = self.preprocess_text(f.readlines())
           date, summary, tags, content = self.parse(contentmd)
           year, month, day = date[:3]
           pretty_date = time.strftime(self.postdateformat, date)
@@ -386,8 +382,6 @@ class Kalpi:
     return stats
 
   def make(self, args, postprocess=[]):
-    utils.info("using '%s (%s)' for blog theme" % (self.datadict["theme"], self.datadict["themefile"]))
-
     # posts
     calist = [x.replace(self.basedir, "") for x in utils.search_files_all("%s/static/images/clipart" % (self.basedir))]
     posts = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=False)
@@ -410,8 +404,9 @@ class Kalpi:
         post["next"]["title"] = posts[idx+1]["title"]
         post["next"]["url"] = posts[idx+1]["url"]
       filename = "%s%s" % (self.outputdir, post["url"])
-      output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post, "tags": self.datadict["tags"], "themefile": self.datadict["themefile"]})
+      output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post, "tags": self.datadict["tags"]})
       output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<hr><h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<h5>', '<h5 class="h5 collapsible" onclick="toggle(this);">').replace('<h6>', '<h6 class="h6 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested active">').replace('<ol>', '<ol class="nested active">').replace('<p>', '<p class="nested active">').replace('<pre><code>', '<pre class="nested active"><code>').replace('<pre><code class="','<pre class="nested active"><code class="').replace('<p class="nested active"><a href="/posts/', '<p><a href="/posts/').replace('<p class="nested active">📅 published on ', '<p>📅 published on ').replace('<p class="nested active">🔖 tagged ', '<p>🔖 tagged ')
+      output = output.replace('](https://7h3ram.github.io/posts/', '](/posts/').replace('href="https://7h3ram.github.io/posts/', 'href="/posts/')
       #output = output.replace('BG_CLIPART_STYLE_HERE', 'class="bgclipart_sq" style="background-image: url(%s);"' % (random.choice(calist)))
       html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True) if "minify" in postprocess else output
       utils.file_save(filename, html)
