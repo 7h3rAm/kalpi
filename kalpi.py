@@ -22,7 +22,7 @@ class Kalpi:
 
     self.datadict["tags"] = {}
     self.datadict["posts"] = {}
-    self.datadict["recent_count"] = 10
+    self.datadict["recent_count"] = 5
     self.basedir = "%s/toolbox/repos/7h3rAm.github.io" % (utils.expand_env(var="$HOME"))
     self.outputdir = self.basedir
     self.postsdir = "%s/_posts" % (self.basedir)
@@ -188,14 +188,14 @@ class Kalpi:
       if line.startswith("date:"):
         date = time.strptime("".join(line.split(":")[1:]).strip(), self.postdateformat)
       if line.startswith("summary:"):
-        summary = "".join(line.split(":")[1:]).strip()
+        summary = ":".join(line.split(":")[1:]).strip()
+        summary = None if summary in ["", "This is the summary for an awesome post."] else summary
       if line.startswith("tags:"):
         tags = []
         for tag in "".join(line.split(":")[1:]).strip().split(", "):
           tags.append(tag.replace(" ", "_"))
       if line == "\n":
         content = self.md2html("".join(lines[idx+1:]))
-        print(content)
         break
     return date, summary, tags, content
 
@@ -267,6 +267,7 @@ class Kalpi:
                 "title": title,
                 "sparkline": sparkcolored,
                 "sparklinelong": sparkcoloredlong,
+                "summary": summary,
                 "url": url,
                 "pretty_date": pretty_date,
                 "year": year,
@@ -278,6 +279,7 @@ class Kalpi:
                 "title": title,
                 "sparkline": sparkcolored,
                 "sparklinelong": sparkcoloredlong,
+                "summary": summary,
                 "url": url,
                 "pretty_date": pretty_date,
                 "year": year,
