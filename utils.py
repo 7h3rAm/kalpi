@@ -5,6 +5,7 @@ import json
 import yaml
 import errno
 import codecs
+import locale
 import fnmatch
 import datetime
 import urllib.request
@@ -285,6 +286,19 @@ def sec_to_human(secs, sep=" and "):
       secs -= quot * divisor
   return sep.join(s)
 
+def currency_human(num):
+  try:
+    for unit in ['','K','M','B','T']:
+      if abs(num) < 1000.0:
+        return "%d%s" % (num, unit)
+      num /= 1000.0
+    return "%d%s" % (num, 'T')
+  except:
+    import traceback
+    print(traceback.print_exc())
+    locale.setlocale(locale.LC_ALL, "")
+    return locale.currency(num, grouping=True)
+
 def sizeof_fmt(num, suffix='B'):
   # https://stackoverflow.com/a/1094933/1079836
   for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
@@ -347,6 +361,30 @@ def to_emoji(text):
     return "🟠"
   elif "insane" == text.lower():
     return "🔴"
+
+  elif "destroyed" == text.lower():
+    return "🔴"
+  elif "retired" == text.lower():
+    return "🟡"
+  elif "active" == text.lower():
+    return "🟢"
+  elif "unknown" == text.lower():
+    return "⚪"
+
+  elif "lost" == text.lower():
+    return "🔴"
+  elif "inactive" == text.lower():
+    return "🟠"
+  elif "expended" == text.lower():
+    return "🟡"
+
+  elif "capsule" == text.lower():
+    return "💊"
+  elif "satellite" == text.lower():
+    return "🛰️"
+  elif "dragon" in text.lower():
+    return "🐉"
+
   else:
     return "⚪"
 

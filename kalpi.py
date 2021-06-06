@@ -23,7 +23,7 @@ class Kalpi:
     self.datadict["tags"] = {}
     self.datadict["posts"] = {}
     self.datadict["recent_count"] = 5
-    self.basedir = "%s/toolbox/repos/7h3rAm.github.io" % (utils.expand_env(var="$HOME"))
+    self.basedir = "%s/7h3rAm.github.io" % (utils.expand_env(var="$PROJECTSPATH"))
     self.outputdir = self.basedir
     self.postsdir = "%s/_posts" % (self.basedir)
     self.templatesdir = "%s/_templates" % (self.basedir)
@@ -37,10 +37,11 @@ class Kalpi:
 
     self.datadict["pages"] = {}
     self.datadict["metadata"] = utils.load_yaml("%s/toolbox/bootstrap/self.yml" % (utils.expand_env(var="$HOME")))["metadata"]
-    self.datadict["startpage"] = utils.load_yaml("%s/startpage.yml" % (self.templatesdir))
-    self.datadict["oscp"] = utils.load_yaml("%s/oscp.yml" % (self.templatesdir))
     self.datadict["fitness"] = utils.load_yaml("%s/fitness.yml" % (self.templatesdir))
     self.datadict["life"] = utils.load_yaml("%s/life.yml" % (self.templatesdir))
+    self.datadict["oscp"] = utils.load_yaml("%s/oscp.yml" % (self.templatesdir))
+    self.datadict["read"] = utils.load_yaml("%s/read.yml" % (self.templatesdir))
+    self.datadict["startpage"] = utils.load_yaml("%s/startpage.yml" % (self.templatesdir))
 
     self.templatemapping = {
       "index.html": "%s/index.html" % (self.outputdir),
@@ -52,6 +53,7 @@ class Kalpi:
       "fitness.html": "%s/pages/fitness.html" % (self.outputdir),
       "life.html": "%s/pages/life.html" % (self.outputdir),
       "oscp.html": "%s/pages/oscp.html" % (self.outputdir),
+      "read.html": "%s/pages/read.html" % (self.outputdir),
       "research.html": "%s/pages/research.html" % (self.outputdir),
       "satview.html": "%s/pages/satview.html" % (self.outputdir),
       "startpage.html": "%s/pages/startpage.html" % (self.outputdir),
@@ -420,6 +422,7 @@ class Kalpi:
     self.render_template("cv.html", postprocess=postprocess)
     self.render_template("fitness.html", postprocess=postprocess)
     self.render_template("life.html", postprocess=postprocess)
+    self.render_template("read.html", postprocess=postprocess)
     self.render_template("oscp.html", postprocess=postprocess)
     self.render_template("research.html", postprocess=postprocess)
     self.render_template("satview.html", postprocess=postprocess)
