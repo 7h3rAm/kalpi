@@ -349,12 +349,130 @@ class Astro:
         "manufacturer": ", ".join(payload["manufacturers"]),
         "orbit": payload["orbit"],
       })
+    self.data["spacex"]["payloads"] = sorted(self.data["spacex"]["payloads"], key=lambda k: k["name"])
 
     # roadster
+    self.data["spacex"]["roadster"] = {}
+    roadsterjson = utils.download_json("https://api.spacexdata.com/v4/roadster")
+    self.data["spacex"]["roadster"]["name"] = roadsterjson["name"]
+    self.data["spacex"]["roadster"]["url"] = roadsterjson["video"]
+    self.data["spacex"]["roadster"]["date"] = datetime.fromtimestamp(roadsterjson["launch_date_unix"], tz=timezone.utc).replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+    self.data["spacex"]["roadster"]["description"] = roadsterjson["details"]
+    self.data["spacex"]["roadster"]["launch_mass"] = "%s lbs" % ("{:,.2f}".format(float(roadsterjson["launch_mass_lbs"])))
+    self.data["spacex"]["roadster"]["orbit"] = roadsterjson["orbit_type"].title()
+    self.data["spacex"]["roadster"]["speed"] = "%s mph" % ("{:,.2f}".format(float(roadsterjson["speed_mph"])))
+    self.data["spacex"]["roadster"]["earth_distance"] = "%s miles" % ("{:,.2f}".format(float(roadsterjson["earth_distance_mi"])))
+    self.data["spacex"]["roadster"]["mars_distance"] = "%s miles" % ("{:,.2f}".format(float(roadsterjson["mars_distance_mi"])))
+
     # rockets
+    self.data["spacex"]["rockets"] = []
+    rocketsjson = utils.download_json("https://api.spacexdata.com/v4/rockets")
+    for rocket in rocketsjson:
+
+      payload_weights_leo, payload_weights_gto, payload_weights_moon, payload_weights_mars = "", "", "", ""
+      for item in rocket["payload_weights"]:
+        if item["id"] == "leo":
+          payload_weights_leo = "%s lbs" % ("{:,}".format(int(item["lb"])))
+        elif item["id"] == "gto":
+          payload_weights_gto = "%s lbs" % ("{:,}".format(int(item["lb"])))
+        elif item["id"] == "moon":
+          payload_weights_moon = "%s lbs" % ("{:,}".format(int(item["lb"])))
+        elif item["id"] == "mars":
+          payload_weights_mars = "%s lbs" % ("{:,}".format(int(item["lb"])))
+
+      self.data["spacex"]["rockets"].append({
+        "name": rocket["name"],
+        "stage": rocket["stages"],
+        "booster": rocket["boosters"],
+        "landing_leg": "%d (%s)" % (rocket["landing_legs"]["number"], rocket["landing_legs"]["material"]),
+        "height": "%s feet" % ("{:,}".format(int(rocket["height"]["feet"]))),
+        "diameter": "%s feet" % ("{:,}".format(int(rocket["diameter"]["feet"]))),
+        "mass": "%s lbs" % ("{:,}".format(int(rocket["mass"]["lb"]))),
+        "launch_cost": "$%s" % ("{:,}".format(int(rocket["cost_per_launch"]))),
+        "success_rate": "%s%%" % (rocket["success_rate_pct"]),
+        "first_flight": datetime.strptime(rocket["first_flight"], "%Y-%m-%d").astimezone(tz=None).strftime("%d/%b/%Y %Z"),
+        "description": rocket["description"],
+        "url": rocket["wikipedia"],
+
+        "first_stage_reusable": rocket["first_stage"]["reusable"],
+        "first_stage_reusable_emoji": utils.to_emoji("good") if rocket["first_stage"]["reusable"] else utils.to_emoji("bad"),
+        "first_stage_engine": rocket["first_stage"]["engines"],
+        "first_stage_fuel": "%s tons" % (rocket["first_stage"]["fuel_amount_tons"]),
+        "first_stage_burn_time": "{:,.2f} sec".format(int(rocket["first_stage"]["burn_time_sec"])) if rocket["first_stage"]["burn_time_sec"] else "",
+
+        "second_stage_reusable": rocket["second_stage"]["reusable"],
+        "second_stage_reusable_emoji": utils.to_emoji("good") if rocket["second_stage"]["reusable"] else utils.to_emoji("bad"),
+        "second_stage_engine": rocket["second_stage"]["engines"],
+        "second_stage_fuel": "%s tons" % (rocket["second_stage"]["fuel_amount_tons"]),
+        "second_stage_burn_time": "{:,.2f} sec".format(int(rocket["second_stage"]["burn_time_sec"])) if rocket["second_stage"]["burn_time_sec"] else "",
+
+        "engine": "%s (%d)" % (rocket["engines"]["type"].title(), rocket["engines"]["number"]),
+        "engine_propellant": "%s, %s" % (rocket["engines"]["propellant_1"], rocket["engines"]["propellant_2"]),
+        "engine_thrust_to_weight": rocket["engines"]["thrust_to_weight"],
+
+        "payload_weights_leo": payload_weights_leo,
+        "payload_weights_gto": payload_weights_gto,
+        "payload_weights_mars": payload_weights_mars,
+        "payload_weights_moon": payload_weights_moon,
+
+        "type": "%d/%d/%s/%s feet/%s feet/%s lbs" % (rocket["stages"], rocket["boosters"], "%d (%s)" % (rocket["landing_legs"]["number"], rocket["landing_legs"]["material"]) if rocket["landing_legs"]["number"] else 0, "{:,}".format(int(rocket["height"]["feet"])), "{:,}".format(int(rocket["diameter"]["feet"])), "{:,}".format(int(rocket["mass"]["lb"]))),
+        "first_stage": "%d/%s tons/%s/%s" % (rocket["first_stage"]["engines"], rocket["first_stage"]["fuel_amount_tons"], "{:,.2f} sec".format(int(rocket["first_stage"]["burn_time_sec"])) if rocket["first_stage"]["burn_time_sec"] else "", utils.to_emoji("good") if rocket["first_stage"]["reusable"] else utils.to_emoji("bad")),
+        "second_stage": "%d/%s tons/%s/%s" % (rocket["second_stage"]["engines"], rocket["second_stage"]["fuel_amount_tons"], "{:,.2f} sec".format(int(rocket["second_stage"]["burn_time_sec"])) if rocket["second_stage"]["burn_time_sec"] else "", utils.to_emoji("good") if rocket["second_stage"]["reusable"] else utils.to_emoji("bad")),
+        "engine": "%d %s engine(s) w/ %s+%s propellants and a thrust-to-weight ratio of %d" % (rocket["engines"]["number"], rocket["engines"]["type"].title(), rocket["engines"]["propellant_1"], rocket["engines"]["propellant_2"], rocket["engines"]["thrust_to_weight"]),
+        "payload": "/%s/%s/%s/%s" % (payload_weights_leo, payload_weights_gto, payload_weights_moon, payload_weights_mars),
+
+      })
+    self.data["spacex"]["rockets"] = sorted(self.data["spacex"]["rockets"], key=lambda k: k["name"])
+
     # ships
+    self.data["spacex"]["ships"] = []
+    shipsjson = utils.download_json("https://api.spacexdata.com/v4/ships")
+    for ship in shipsjson:
+      self.data["spacex"]["ships"].append({
+        "name": ship["name"],
+        "status_emoji": utils.to_emoji("good") if ship["active"] else utils.to_emoji("bad"),
+        "url": ship["link"],
+        "port": ship["home_port"],
+        "mass": "%s lbs" % ("{:,.2f}".format(float(item["lb"]))),
+        "launches": len(ship["launches"]),
+        "type": ship["type"],
+        "roles": ", ".join(ship["roles"]),
+      })
+    self.data["spacex"]["ships"] = sorted(self.data["spacex"]["ships"], key=lambda k: k["name"])
+
     # starlink
+    self.data["spacex"]["starlink"] = []
+    starlinkjson = utils.download_json("https://api.spacexdata.com/v4/starlink")
+    locs = []
+    for starlink in starlinkjson:
+      if starlink["latitude"] and starlink["longitude"]:
+        locs.append("%s,%s" % ("{:,.2f}".format(float(starlink["latitude"])), "{:,.2f}".format(float(starlink["longitude"]))))
+      self.data["spacex"]["starlink"].append({
+        "name": starlink["spaceTrack"]["OBJECT_NAME"],
+        "launch": datetime.strptime(starlink["spaceTrack"]["LAUNCH_DATE"], "%Y-%m-%d").astimezone(tz=None).strftime("%d/%b/%Y %Z"),
+        "epoch": datetime.strptime(starlink["spaceTrack"]["LAUNCH_DATE"], "%Y-%m-%d").timestamp(),
+        "latitude": starlink["latitude"] if starlink["latitude"] else None,
+        "longitude": starlink["longitude"] if starlink["longitude"] else None,
+        "location": "http://maps.google.com/maps?q=%s,%s" % (starlink["latitude"], starlink["longitude"]) if starlink["latitude"] and starlink["longitude"] else None,
+        "height": "%s miles" % ("{:,.2f}".format(float(starlink["height_km"])*0.62137)) if starlink["height_km"] else None,
+        "velocity": "%s mph" % ("{:,.2f}".format(float(starlink["velocity_kms"])*0.62137*60*60)) if starlink["velocity_kms"] else None,
+      })
+    self.data["spacex"]["starlink"] = sorted(self.data["spacex"]["starlink"], key=lambda k: k["epoch"])
+
     # history
+    self.data["spacex"]["history"] = []
+    historyjson = utils.download_json("https://api.spacexdata.com/v4/history")
+    locs = []
+    for history in historyjson:
+      self.data["spacex"]["history"].append({
+        "title": history["title"],
+        "url": history["links"]["article"] if history["links"]["article"] else None,
+        "date": datetime.fromtimestamp(history["event_date_unix"], tz=timezone.utc).replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%d/%b/%Y %Z"),
+        "description": history["details"],
+        "epoch": history["event_date_unix"],
+      })
+    self.data["spacex"]["history"] = sorted(self.data["spacex"]["history"], key=lambda k: k["epoch"])
+
     self.data["spacex"]["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
 
   def update(self):

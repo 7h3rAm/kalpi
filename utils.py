@@ -385,6 +385,11 @@ def to_emoji(text):
   elif "dragon" in text.lower():
     return "🐉"
 
+  elif "bad" == text.lower():
+    return "🔴"
+  elif "good" == text.lower():
+    return "🟢"
+
   else:
     return "⚪"
 
