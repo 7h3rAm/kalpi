@@ -178,10 +178,13 @@ def file_save(filename, data, mode="w"):
         except:
           fo.write(data.encode('utf-16', 'surrogatepass').decode('utf-16'))
 
-def download(url, filename):
-  res = requests.get(url)
+def download(url, filename, timeout=5):
+  res = requests.get(url, timeout=timeout)
   if res.status_code == 200:
     open(filename, "wb").write(res.content)
+    return filename
+  else:
+    return False
 
 def get_http_res(url, headers={}):
   res = requests.get(cleanup_url(url), headers=headers)

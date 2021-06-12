@@ -56,6 +56,7 @@ class Kalpi:
       "read.html": "%s/pages/read.html" % (self.outputdir),
       "research.html": "%s/pages/research.html" % (self.outputdir),
       "satview.html": "%s/pages/satview.html" % (self.outputdir),
+      "astro.html": "%s/pages/astro.html" % (self.outputdir),
       "startpage.html": "%s/pages/startpage.html" % (self.outputdir),
     }
 
@@ -426,6 +427,7 @@ class Kalpi:
     self.render_template("oscp.html", postprocess=postprocess)
     self.render_template("research.html", postprocess=postprocess)
     self.render_template("satview.html", postprocess=postprocess)
+    #self.render_template("astro.html", postprocess=postprocess)
     self.render_template("startpage.html", postprocess=postprocess)
 
     # default

@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 from pprint import pprint
+import time
 
 import utils
 
@@ -83,7 +84,7 @@ class Astro:
       "archiveurl": "https://apod.nasa.gov/apod/archivepix.html",
     }
     apodjson = utils.download_json("https://api.nasa.gov/planetary/apod?api_key=%s" % (self.apikey))
-    self.data["apod"]["title"] = "%s (%s)" % (apodjson["title"], datetime.strptime(apodjson["date"], '%Y-%m-%d').strftime("%d/%b/%Y"))
+    self.data["apod"]["title"] = "%s (%s)" % (apodjson["title"], datetime.strptime(apodjson["date"], '%Y-%m-%d').astimezone(tz=None).strftime("%d/%b/%Y %Z"))
     self.data["apod"]["source"] = apodjson["url"]
     self.data["apod"]["datastore"] = "%s/apod.jpg" % (self.datastore_url)
     self.downloads[self.data["apod"]["source"]] = "%s/apod.jpg" % (self.datastore_path)
@@ -114,10 +115,25 @@ class Astro:
 
   def eonet(self):
     self.data["eonet"] = {
-      "date": datetime.now().astimezone(tz=None).strftime("%d/%b/%Y"),
+      "date": datetime.now().astimezone(tz=None).strftime("%d/%b/%Y %Z"),
       "events": [],
     }
     eonetjson = utils.download_json("https://eonet.sci.gsfc.nasa.gov/api/v3/events?status=open&days=30")
+    self.data["eonet"]["mapdata"] = {
+      "Drought": [],
+      "Dust and Haze": [],
+      "Earthquakes": [],
+      "Floods": [],
+      "Landslides": [],
+      "Manmade": [],
+      "Sea and Lake Ice": [],
+      "Severe Storms": [],
+      "Snow": [],
+      "Temperature Extremes": [],
+      "Volcanoes": [],
+      "Water Color": [],
+      "Wildfires": [],
+    }
     for event in eonetjson["events"]:
       self.data["eonet"]["events"].append({
         "eid": event["id"],
@@ -127,9 +143,80 @@ class Astro:
         "category": [self.category_map[x["title"]] for x in event["categories"]],
         "source": [{"url": x["url"], "sid": x["id"]} for x in event["sources"]],
       })
+
+      for cat in event["categories"]:
+
+        if cat["title"] == "Drought":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Drought"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Dust and Haze":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Dust and Haze"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Earthquakes":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Earthquakes"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Floods":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Floods"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Landslides":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Landslides"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Manmade":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Manmade"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Sea and Lake Ice":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Sea and Lake Ice"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Severe Storms":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Severe Storms"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Snow":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Snow"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Temperature Extremes":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Temperature Extremes"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Volcanoes":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Volcanoes"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Water Color":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Water Color"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
+        if cat["title"] == "Wildfires":
+          for coord in event["geometry"]:
+            self.data["eonet"]["mapdata"]["Wildfires"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+
     self.data["eonet"]["title"] = "%d events (%s)" % (len(self.data["eonet"]["events"]), self.data["eonet"]["date"])
     self.data["eonet"]["events"] = sorted(self.data["eonet"]["events"], key=lambda k: k["name"])
     self.data["eonet"]["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+
+  def spaceppl(self):
+    self.data["spaceppl"] = {
+      "title": None,
+      "people": [],
+    }
+    spaceppljson = utils.download_json("http://api.open-notify.org/astros.json")
+    for ppl in spaceppljson["people"]:
+      self.data["spaceppl"]["people"].append({
+        "name": ppl["name"],
+        "url": "https://www.google.com/search?q=Astronaut+%s" % (ppl["name"].replace(" ", "+")),
+        "spacecraft": ppl["craft"],
+      })
+    self.data["spaceppl"]["title"] = "%d people in space (%s)" % (len(self.data["spaceppl"]["people"]), datetime.now().astimezone(tz=None).strftime("%d/%b/%Y %Z"))
+    self.data["spaceppl"]["people"] = sorted(self.data["spaceppl"]["people"], key=lambda k: k["name"])
+    self.data["spaceppl"]["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
 
   def spacex(self):
     self.data["spacex"]["capsules"] = []
@@ -364,14 +451,41 @@ class Astro:
     self.data["spacex"]["ships"] = sorted(self.data["spacex"]["ships"], key=lambda k: k["name"])
 
     # starlink
-    self.data["spacex"]["starlink"] = []
+    self.data["spacex"]["starlink"] = {
+      "satellites": [],
+      "mapdata": [],
+      "stats": {
+        "inorbit": 0,
+        "decayed": 0,
+        "total": 0,
+        "firstlaunch": None,
+        "latestlaunch": None,
+      },
+    }
     starlinkjson = utils.download_json("https://api.spacexdata.com/v4/starlink")
-    locs = []
+    locs, epochs = [], []
     for starlink in starlinkjson:
+      self.data["spacex"]["starlink"]["stats"]["total"] += 1
+      epochs.append(datetime.strptime(starlink["spaceTrack"]["LAUNCH_DATE"], "%Y-%m-%d").timestamp())
       if starlink["latitude"] and starlink["longitude"]:
+        self.data["spacex"]["starlink"]["stats"]["inorbit"] += 1
         locs.append("%s,%s" % ("{:,.2f}".format(float(starlink["latitude"])), "{:,.2f}".format(float(starlink["longitude"]))))
-      self.data["spacex"]["starlink"].append({
+        self.data["spacex"]["starlink"]["mapdata"].append([
+          '<a href="https://www.n2yo.com/satellite/?s=%s"><b>%s</b></a><br/>Launch: %s<br/>Height: %s<br/>Velocity: %s' % (
+              starlink["spaceTrack"]["NORAD_CAT_ID"],
+              starlink["spaceTrack"]["OBJECT_NAME"],
+              datetime.strptime(starlink["spaceTrack"]["LAUNCH_DATE"], "%Y-%m-%d").astimezone(tz=None).strftime("%d/%b/%Y %Z"),
+              "%s miles" % ("{:,.2f}".format(float(starlink["height_km"])*0.62137)) if starlink["height_km"] else "",
+              "%s mph" % ("{:,.2f}".format(float(starlink["velocity_kms"])*0.62137*60*60)) if starlink["velocity_kms"] else "",
+            ),
+          starlink["latitude"],
+          starlink["longitude"],
+        ])
+      else:
+        self.data["spacex"]["starlink"]["stats"]["decayed"] += 1
+      self.data["spacex"]["starlink"]["satellites"].append({
         "name": starlink["spaceTrack"]["OBJECT_NAME"],
+        "url": "https://www.n2yo.com/satellite/?s=%s" % (starlink["spaceTrack"]["NORAD_CAT_ID"]),
         "launch": datetime.strptime(starlink["spaceTrack"]["LAUNCH_DATE"], "%Y-%m-%d").astimezone(tz=None).strftime("%d/%b/%Y %Z"),
         "epoch": datetime.strptime(starlink["spaceTrack"]["LAUNCH_DATE"], "%Y-%m-%d").timestamp(),
         "latitude": starlink["latitude"] if starlink["latitude"] else None,
@@ -380,12 +494,13 @@ class Astro:
         "height": "%s miles" % ("{:,.2f}".format(float(starlink["height_km"])*0.62137)) if starlink["height_km"] else None,
         "velocity": "%s mph" % ("{:,.2f}".format(float(starlink["velocity_kms"])*0.62137*60*60)) if starlink["velocity_kms"] else None,
       })
-    self.data["spacex"]["starlink"] = sorted(self.data["spacex"]["starlink"], key=lambda k: k["epoch"])
+    self.data["spacex"]["starlink"]["satellites"] = sorted(self.data["spacex"]["starlink"]["satellites"], key=lambda k: k["epoch"])
+    self.data["spacex"]["starlink"]["stats"]["firstlaunch"] = time.strftime("%d/%b/%Y %Z", time.localtime(min(epochs)))
+    self.data["spacex"]["starlink"]["stats"]["latestlaunch"] = time.strftime("%d/%b/%Y %Z", time.localtime(max(epochs)))
 
     # history
     self.data["spacex"]["history"] = []
     historyjson = utils.download_json("https://api.spacexdata.com/v4/history")
-    locs = []
     for history in historyjson:
       self.data["spacex"]["history"].append({
         "title": history["title"],
@@ -400,87 +515,135 @@ class Astro:
 
   def satview(self):
     self.data["satview"] = {
-      "date": datetime.now().astimezone(tz=None).strftime("%d/%b/%Y"),
+      "date": datetime.now().astimezone(tz=None).strftime("%d/%b/%Y %Z"),
       "fullday": {
-        "datastore_hstack": "https://raw.githubusercontent.com/7h3rAm/datastore/master/earthview-hstack.gif",
-        "datastore_vstack": "https://raw.githubusercontent.com/7h3rAm/datastore/master/earthview-vstack.gif",
+        "datastore_hstack": "https://raw.githubusercontent.com/7h3rAm/datastore/master/earthview_hstack.gif",
+        "datastore_vstack": "https://raw.githubusercontent.com/7h3rAm/datastore/master/earthview_vstack.gif",
         "url": "https://twitter.com/7h3rAm/status/1401555983373987842",
-        "title_hstack": "Earth Full Day: 05/JUN/2021 (Horizontally Stacked)",
-        "title_vstack": "Earth Full Day: 05/JUN/2021 (Vertically Stacked)",
-      },
-      "dscovr_epic": {
-        "message": "This image was taken by NASA's EPIC camera onboard the NOAA DSCOVR spacecraft on 2021-05-26 00:13:03.",
-        "source": "https://epic.gsfc.nasa.gov/archive/natural/2021/05/26/jpg/epic_1b_20210526001752.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/dscovr_epic.jpg"
+        "title_hstack": "Earth Full Day: 07/JUN/2021 (Horizontally Stacked)",
+        "title_vstack": "Earth Full Day: 07/JUN/2021 (Vertically Stacked)",
       },
       "himawari8_naturalcolor": {
         "source": "http://rammb.cira.colostate.edu/ramsdis/online/images/latest/himawari-8/full_disk_ahi_natural_color.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/himwari8-full_disk_ahi_natural_color.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/himwari8_naturalcolor.jpg"
       },
       "himawari8_truecolor": {
         "source": "http://rammb.cira.colostate.edu/ramsdis/online/images/latest/himawari-8/full_disk_ahi_true_color.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/himwari8-full_disk_ahi_true_color.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/himwari8_truecolor.jpg"
       },
       "goes16_geocolor": {
         "source": "https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/1808x1808.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/goes16-1808x1808.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/goes16.jpg"
       },
       "goes17_geocolor": {
         "source": "https://cdn.star.nesdis.noaa.gov/GOES17/ABI/FD/GEOCOLOR/1808x1808.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/goes17-1808x1808.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/goes17.jpg"
       },
       "meteosat0_naturalcolor": {
         "source": "https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColourEnhncd_LowResolution.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/EUMETSAT_MSG_RGBNatColourEnhncd_LowResolution.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/meteosat0.jpg"
       },
       "meteosat415_naturalcolor": {
         "source": "https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColourEnhncd_LowResolution.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/EUMETSAT_MSGIODC_RGBNatColourEnhncd_LowResolution.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/meteosat415.jpg"
       },
       "elektrol": {
-        "source": "view-source:http://electro.ntsomz.ru/i/splash/20210529-2330.jpg",
+        "source": "http://electro.ntsomz.ru/i/splash/20210529-2330.jpg",
         "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/elektrol.jpg"
       },
       "insat_fd_ir": {
         "source": "https://mausam.imd.gov.in/Satellite/3Dglobe_ir1.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/insat-3Dglobe_ir1.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/insat_ir1.jpg"
       },
       "insat_fd_vis": {
         "source": "https://mausam.imd.gov.in/Satellite/3Dglobe_vis.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/insat-3Dglobe_vis.jpg"
-      },
-      "insat_2d_ir": {
-        "source": "https://mausam.imd.gov.in/Satellite/Converted/IR1.gif",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/insat-IR1.gif"
-      },
-      "insat_2d_vis": {
-        "source": "https://mausam.imd.gov.in/Satellite/Converted/VIS.gif",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/insat-VIS.gif"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/insat_vis.jpg"
       },
       "sdo_0171": {
         "source": "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/latest_1024_0171.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/sdo_0171.jpg"
       },
       "sdo_0304": {
         "source": "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/latest_1024_0304.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/sdo_0304.jpg"
       },
-      "sdo_HMID": {
+      "sdo_hmid": {
         "source": "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMID.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/latest_1024_HMID.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/sdo_hmid.jpg"
       },
-      "sdo_HMIIC": {
+      "sdo_hmiic": {
         "source": "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIC.jpg",
-        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/latest_1024_HMIIC.jpg"
+        "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/sdo_hmiic.jpg"
       },
     }
 
+    epicjson = utils.download_json("https://epic.gsfc.nasa.gov/api/natural")
+    ids = []
+    for epic in epicjson:
+      ids.append(int(epic["identifier"]))
+    latest_id = max(ids)
+    for epic in epicjson:
+      if int(epic["identifier"]) == latest_id:
+        date_obj = datetime.strptime("%s GMT" % (epic["date"].replace(" ", "T")), "%Y-%m-%dT%H:%M:%S GMT").replace(tzinfo=timezone.utc)
+        self.data["satview"]["dscovr_epic"] = {
+          "message": "%s on %s." % (epic["caption"], date_obj.astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")),
+          "source": "https://epic.gsfc.nasa.gov/archive/natural/%s/%s/%s/jpg/%s.jpg" % (epic["identifier"][0:4], epic["identifier"][4:6], epic["identifier"][6:8], epic["image"]),
+          "datastore": "https://raw.githubusercontent.com/7h3rAm/datastore/master/dscovr_epic.jpg",
+        }
+
+    sats = ["dscovr_epic", "himawari8_naturalcolor", "himawari8_truecolor", "goes16_geocolor", "goes17_geocolor", "meteosat0_naturalcolor", "meteosat415_naturalcolor", "elektrol", "insat_fd_ir", "insat_fd_vis", "sdo_0171", "sdo_0304", "sdo_hmid", "sdo_hmiic"]
+    total = len(sats)
+    for idx, sat in enumerate(sats):
+      destination_filepath = "%s/%s" % (self.datastore_path, self.data["satview"][sat]["datastore"].split("/")[-1])
+      print("[%d/%d] %s" % (idx+1, total, self.data["satview"][sat]["source"]))
+      try:
+        utils.download(self.data["satview"][sat]["source"], destination_filepath)
+      except:
+        print("[!] could not download from %s" % (self.data["satview"][sat]["source"]))
+
+  def marsphotos(self):
+    # https://github.com/chrisccerami/mars-photo-api
+    return
+
+  def solarbody(self):
+    self.data["spacex"]["solarbody"] = []
+    solarbodyjson = utils.download_json("https://api.le-systeme-solaire.net/rest/bodies/")
+    for solarbody in solarbodyjson:
+      self.data["spacex"]["solarbody"].append({
+        "title": solarbody["title"],
+        "url": solarbody["links"]["article"] if solarbody["links"]["article"] else None,
+        "date": datetime.fromtimestamp(solarbody["event_date_unix"], tz=timezone.utc).replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%d/%b/%Y %Z"),
+        "description": solarbody["details"],
+        "epoch": solarbody["event_date_unix"],
+      })
+    self.data["spacex"]["solarbody"] = sorted(self.data["spacex"]["solarbody"], key=lambda k: k["epoch"])
+
   def update(self):
     self.data = utils.load_json(self.datafile_path)
-    #self.apod()
-    #self.neo()
-    #self.eonet()
-    #self.spacex()
+
+    #self.marsphotos()
+    #self.solarbody()
+
+    self.apod()
+    self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+    utils.save_json(self.data, self.datafile_path)
+
+    self.eonet()
+    self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+    utils.save_json(self.data, self.datafile_path)
+
+    self.neo()
+    self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+    utils.save_json(self.data, self.datafile_path)
+
+    self.spaceppl()
+    self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+    utils.save_json(self.data, self.datafile_path)
+
+    self.spacex()
+    self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+    utils.save_json(self.data, self.datafile_path)
+
     self.satview()
     self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.data, self.datafile_path)
