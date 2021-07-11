@@ -19,7 +19,7 @@ class Astro:
       "last_update": None,
       "apod": None,
       "neo": None,
-      "eonet": None,
+      "earthevents": None,
       "satview": None,
       "spacex": None,
     }
@@ -35,6 +35,10 @@ class Astro:
       "Earthquakes": {
         "url": "https://eonet.sci.gsfc.nasa.gov/api/v3/categories/earthquakes",
         "emoji": "🌐",
+      },
+      "Earthquake": {
+        "url": "https://earthquake.usgs.gov/earthquakes/",
+        "emoji": "🔴",
       },
       "Floods": {
         "url": "https://eonet.sci.gsfc.nasa.gov/api/v3/categories/floods",
@@ -113,13 +117,14 @@ class Astro:
     self.data["neo"]["objects"] = sorted(self.data["neo"]["objects"], key=lambda k: k["name"])
     self.data["neo"]["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
 
-  def eonet(self):
-    self.data["eonet"] = {
+  def earthevents(self):
+    self.data["earthevents"] = {
       "date": datetime.now().astimezone(tz=None).strftime("%d/%b/%Y %Z"),
       "events": [],
     }
     eonetjson = utils.download_json("https://eonet.sci.gsfc.nasa.gov/api/v3/events?status=open&days=30")
-    self.data["eonet"]["mapdata"] = {
+    usgseqjson = utils.download_json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson")
+    self.data["earthevents"]["mapdata"] = {
       "Drought": [],
       "Dust and Haze": [],
       "Earthquakes": [],
@@ -135,7 +140,7 @@ class Astro:
       "Wildfires": [],
     }
     for event in eonetjson["events"]:
-      self.data["eonet"]["events"].append({
+      self.data["earthevents"]["events"].append({
         "eid": event["id"],
         "name": event["title"],
         "url": event["link"],
@@ -148,59 +153,81 @@ class Astro:
 
         if cat["title"] == "Drought":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Drought"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Drought"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Dust and Haze":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Dust and Haze"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Dust and Haze"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Earthquakes":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Earthquakes"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Earthquakes"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Floods":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Floods"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Floods"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Landslides":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Landslides"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Landslides"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Manmade":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Manmade"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Manmade"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Sea and Lake Ice":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Sea and Lake Ice"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Sea and Lake Ice"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Severe Storms":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Severe Storms"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Severe Storms"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Snow":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Snow"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Snow"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Temperature Extremes":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Temperature Extremes"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Temperature Extremes"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Volcanoes":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Volcanoes"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Volcanoes"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Water Color":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Water Color"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Water Color"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
         if cat["title"] == "Wildfires":
           for coord in event["geometry"]:
-            self.data["eonet"]["mapdata"]["Wildfires"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
+            self.data["earthevents"]["mapdata"]["Wildfires"].append(['<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: %s' % (coord["coordinates"][1], coord["coordinates"][0], event["title"], ", ".join(list(sorted([x["title"] for x in event["categories"]]))), ", ".join(list(sorted(['<a href="%s">%s</a>' % (x["url"], x["id"]) for x in event["sources"]])))), coord["coordinates"][1], coord["coordinates"][0]])
 
-    self.data["eonet"]["title"] = "%d events (%s)" % (len(self.data["eonet"]["events"]), self.data["eonet"]["date"])
-    self.data["eonet"]["events"] = sorted(self.data["eonet"]["events"], key=lambda k: k["name"])
-    self.data["eonet"]["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+    for event in usgseqjson["features"]:
+      if event["properties"]["type"] == "earthquake" and event["properties"]["mag"] >= 4:
+        self.data["earthevents"]["events"].append({
+          "eid": event["id"],
+          "name": event["properties"]["title"],
+          "url": event["properties"]["url"],
+          "location": "http://maps.google.com/maps?q=%s,%s" % (event["geometry"]["coordinates"][1], event["geometry"]["coordinates"][0]),
+          "category": [self.category_map[event["properties"]["type"].title()]],
+          "source": [{"url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php", "sid": "USGS"}],
+        })
+        self.data["earthevents"]["mapdata"]["Earthquakes"].append([
+          '<a href="http://maps.google.com/maps?q=%s,%s"><b>%s</b></a><br/>Category: %s<br/>Source: <a href="%s">USGS</a>' % (
+            event["geometry"]["coordinates"][1],
+            event["geometry"]["coordinates"][0],
+            event["properties"]["title"],
+            event["properties"]["type"].title(),
+            event["properties"]["url"],
+          ),
+          event["geometry"]["coordinates"][1],
+          event["geometry"]["coordinates"][0],
+        ])
+
+    self.data["earthevents"]["title"] = "%d events (%s)" % (len(self.data["earthevents"]["events"]), self.data["earthevents"]["date"])
+    self.data["earthevents"]["events"] = sorted(self.data["earthevents"]["events"], key=lambda k: k["name"])
+    self.data["earthevents"]["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
 
   def spaceppl(self):
     self.data["spaceppl"] = {
@@ -317,18 +344,26 @@ class Astro:
     self.data["spacex"]["landpads"] = sorted(self.data["spacex"]["landpads"], key=lambda k: k["name"])
 
     # launches
-    self.data["spacex"]["launches"] = []
+    self.data["spacex"]["launches"] = {
+      "past": [],
+      "future": [],
+    }
     launchesjson = utils.download_json("https://api.spacexdata.com/v4/launches")
     for launch in launchesjson:
-      self.data["spacex"]["launches"].append({
+      launchdata = {
         "name": launch["name"],
         "launch": datetime.fromtimestamp(launch["date_unix"], tz=timezone.utc).replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z"),
         "upcoming": launch["upcoming"],
         "flight": launch["flight_number"],
         "description": launch["details"],
         "url": launch["links"]["webcast"],
-      })
-    self.data["spacex"]["launches"] = sorted(self.data["spacex"]["launches"], key=lambda k: k["flight"])
+      }
+      if launch["upcoming"]:
+        self.data["spacex"]["launches"]["future"].append(launchdata)
+      else:
+        self.data["spacex"]["launches"]["past"].append(launchdata)
+    self.data["spacex"]["launches"]["past"] = sorted(self.data["spacex"]["launches"]["past"], key=lambda k: k["flight"])
+    self.data["spacex"]["launches"]["future"] = sorted(self.data["spacex"]["launches"]["future"], key=lambda k: k["flight"])
 
     # launchpads
     self.data["spacex"]["launchpads"] = []
@@ -605,6 +640,19 @@ class Astro:
     # https://github.com/chrisccerami/mars-photo-api
     return
 
+  def dsn(self):
+    # https://twitter.com/dsn_status
+    # https://github.com/russss/pydsn/blob/master/parser.py
+    return
+
+  def mrn(self):
+    # https://twitter.com/mrn_status
+    # https://github.com/russss/mrn_status/blob/main/mrn.py
+    # https://mars.nasa.gov/rss/api/?feed=marsrelay&category=all&feedtype=json
+    # https://mars.nasa.gov/rss/api/?feed=marsrelay_db&category=all&feedtype=json
+    # https://mars.nasa.gov/rss/api/?feed=marsrelay_oe&category=all&feedtype=json
+    return
+
   def solarbody(self):
     self.data["spacex"]["solarbody"] = []
     solarbodyjson = utils.download_json("https://api.le-systeme-solaire.net/rest/bodies/")
@@ -618,32 +666,29 @@ class Astro:
       })
     self.data["spacex"]["solarbody"] = sorted(self.data["spacex"]["solarbody"], key=lambda k: k["epoch"])
 
+  def spaceprobes(self):
+    # https://github.com/spacehackers/api.spaceprob.es
+    # http://murmuring-anchorage-8062.herokuapp.com/distances.json
+    return
+
   def update(self):
     self.data = utils.load_json(self.datafile_path)
-
-    #self.marsphotos()
-    #self.solarbody()
 
     self.apod()
     self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.data, self.datafile_path)
-
-    self.eonet()
+    self.earthevents()
     self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.data, self.datafile_path)
-
     self.neo()
     self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.data, self.datafile_path)
-
     self.spaceppl()
     self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.data, self.datafile_path)
-
     self.spacex()
     self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.data, self.datafile_path)
-
     self.satview()
     self.data["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.data, self.datafile_path)

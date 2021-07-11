@@ -332,6 +332,10 @@ def yturl2verboseid(url):
 def sparkify(difficulty):
   return sparkline.sparkify(difficulty)
 
+def chunkify(l, n):
+  for i in range(0, len(l), n):
+    yield l[i:i + n]
+
 def to_color_difficulty(sparkline):
   return "".join([green(sparkline[:3]), yellow(sparkline[3:7]), red(sparkline[7:])])
 
