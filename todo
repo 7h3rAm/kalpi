@@ -13,3 +13,83 @@ stats:
     hackthebox:
     vulnhub:
     tryhackme:
+
+oscplike:
+cp /home/kali/toolbox/repos/writeups/htb.bashed/writeup.pdf /home/kali/toolbox/repos/killchains/htb-bashed-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.blocky/writeup.pdf /home/kali/toolbox/repos/killchains/htb-blocky-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.blue/writeup.pdf /home/kali/toolbox/repos/killchains/htb-blue-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.buff/writeup.pdf /home/kali/toolbox/repos/killchains/htb-buff-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.cronos/writeup.pdf /home/kali/toolbox/repos/killchains/htb-cronos-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.devel/writeup.pdf /home/kali/toolbox/repos/killchains/htb-devel-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.grandpa/writeup.pdf /home/kali/toolbox/repos/killchains/htb-grandpa-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.granny/writeup.pdf /home/kali/toolbox/repos/killchains/htb-granny-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.lame/writeup.pdf /home/kali/toolbox/repos/killchains/htb-lame-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.legacy/writeup.pdf /home/kali/toolbox/repos/killchains/htb-legacy-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.mirai/writeup.pdf /home/kali/toolbox/repos/killchains/htb-mirai-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.optimum/writeup.pdf /home/kali/toolbox/repos/killchains/htb-optimum-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/htb.shocker/writeup.pdf /home/kali/toolbox/repos/killchains/htb-shocker-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.billymadison1dot1/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-billymadison1dot1-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.brainpan/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-brainpan-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.bsidesvancouver2018workshop/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-bsidesvancouver2018workshop-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.dc6/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-dc6-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.escalatelinux/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-escalatelinux-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.fristileaks1dot3/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-fristikeals1dot3-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.hackme/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-hackme-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.imf/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-imf-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.infosecpreposcp/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-infosecpreposcp-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix1/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-kioptrix1-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix2/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-kioptrix2-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix3/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-kioptrix3-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix4/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-kioptrix4-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix5/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-kioptrix5-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.lazysysadmin1/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-lazysysadmin1-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.linsecurity1/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-linsecurity1-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.lordoftheroot101/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-lordoftheroot101-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.misdirection1/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-misdirection1-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.moria11/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-moria11-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.mrrobot1/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-mrrobot1-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.node1/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-node1-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.quaoar/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-quaoar-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.sedna/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-sedna-writeup.pdf
+cp /home/kali/toolbox/repos/writeups/vulnhub.vulnix/writeup.pdf /home/kali/toolbox/repos/killchains/vulnhub-vulnix-writeup.pdf
+
+cp /home/kali/toolbox/repos/writeups/htb.bashed/killchain.png /home/kali/toolbox/repos/killchains/htb-bashed-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.blocky/killchain.png /home/kali/toolbox/repos/killchains/htb-blocky-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.blue/killchain.png /home/kali/toolbox/repos/killchains/htb-blue-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.buff/killchain.png /home/kali/toolbox/repos/killchains/htb-buff-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.cronos/killchain.png /home/kali/toolbox/repos/killchains/htb-cronos-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.devel/killchain.png /home/kali/toolbox/repos/killchains/htb-devel-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.grandpa/killchain.png /home/kali/toolbox/repos/killchains/htb-grandpa-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.granny/killchain.png /home/kali/toolbox/repos/killchains/htb-granny-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.lame/killchain.png /home/kali/toolbox/repos/killchains/htb-lame-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.legacy/killchain.png /home/kali/toolbox/repos/killchains/htb-legacy-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.mirai/killchain.png /home/kali/toolbox/repos/killchains/htb-mirai-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.optimum/killchain.png /home/kali/toolbox/repos/killchains/htb-optimum-killchain.png
+cp /home/kali/toolbox/repos/writeups/htb.shocker/killchain.png /home/kali/toolbox/repos/killchains/htb-shocker-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.billymadison1dot1/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-billymadison1dot1-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.brainpan/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-brainpan-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.bsidesvancouver2018workshop/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-bsidesvancouver2018workshop-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.dc6/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-dc6-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.escalatelinux/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-escalatelinux-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.fristileaks1dot3/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-fristikeals1dot3-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.hackme/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-hackme-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.imf/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-imf-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.infosecpreposcp/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-infosecpreposcp-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix1/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-kioptrix1-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix2/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-kioptrix2-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix3/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-kioptrix3-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix4/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-kioptrix4-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.kioptrix5/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-kioptrix5-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.lazysysadmin1/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-lazysysadmin1-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.linsecurity1/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-linsecurity1-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.lordoftheroot101/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-lordoftheroot101-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.misdirection1/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-misdirection1-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.moria11/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-moria11-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.mrrobot1/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-mrrobot1-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.node1/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-node1-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.quaoar/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-quaoar-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.sedna/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-sedna-killchain.png
+cp /home/kali/toolbox/repos/writeups/vulnhub.vulnix/killchain.png /home/kali/toolbox/repos/killchains/vulnhub-vulnix-killchain.png
+
+exiftool -Title="OSCPlike HackTheBox|VulnHub Killchains" -Creator="" -Author="Ankur Tyagi (@7h3rAm)" -Subject="OSCPlike HackTheBox|Vulnhub Killchains" -Keywords="ctf,writeup,killchain,oscp,oscplike,hackthebox,htb,vulnhub" -Description="These are killchains for OSCPlike HackTheBox and VulnHub machines. For more details, check https://github.com/7h3rAm/writeups repository." killchains.pdf
+exiftool -Title="OSCPlike HackTheBox|VulnHub Writeups" -Creator="" -Author="Ankur Tyagi (@7h3rAm)" -Subject="OSCPlike HackTheBox|Vulnhub Writeups" -Keywords="ctf,writeup,oscp,oscplike,hackthebox,htb,vulnhub" -Description="These are writeups for OSCPlike HackTheBox and VulnHub machines. For more details, check https://github.com/7h3rAm/writeups repository." writeups.pdf

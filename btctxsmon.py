@@ -228,6 +228,8 @@ class BTCTxsMon:
       self.wallet["category"]["donation"][self.address["category"]["donation"][address]["wallet"]]["received"] += (self.address["category"]["donation"][address]["received"] / (10**8))
       self.wallet["category"]["donation"][self.address["category"]["donation"][address]["wallet"]]["sent"] += (self.address["category"]["donation"][address]["sent"] / (10**8))
       self.wallet["category"]["donation"][self.address["category"]["donation"][address]["wallet"]]["address"] += 1
+      if "lasttxepoch" not in self.address["category"]["donation"][address]:
+        self.address["category"]["donation"][address]["lasttxepoch"] = None
       if self.address["category"]["donation"][address]["lasttxepoch"] and self.wallet["category"]["donation"][self.address["category"]["donation"][address]["wallet"]]["lasttxepoch"]:
         self.wallet["category"]["donation"][self.address["category"]["donation"][address]["wallet"]]["lasttxepoch"] = self.address["category"]["donation"][address]["lasttxepoch"] if self.address["category"]["donation"][address]["lasttxepoch"] > self.wallet["category"]["donation"][self.address["category"]["donation"][address]["wallet"]]["lasttxepoch"] else self.wallet["category"]["donation"][self.address["category"]["donation"][address]["wallet"]]["lasttxepoch"]
       elif self.address["category"]["donation"][address]["lasttxepoch"]:
@@ -262,6 +264,8 @@ class BTCTxsMon:
       self.wallet["category"]["popular"][self.address["category"]["popular"][address]["wallet"]]["received"] += (self.address["category"]["popular"][address]["received"] / (10**8))
       self.wallet["category"]["popular"][self.address["category"]["popular"][address]["wallet"]]["sent"] += (self.address["category"]["popular"][address]["sent"] / (10**8))
       self.wallet["category"]["popular"][self.address["category"]["popular"][address]["wallet"]]["address"] += 1
+      if "lasttxepoch" not in self.address["category"]["popular"][address]:
+        self.address["category"]["popular"][address]["lasttxepoch"] = None
       if self.address["category"]["popular"][address]["lasttxepoch"] and self.wallet["category"]["popular"][self.address["category"]["popular"][address]["wallet"]]["lasttxepoch"]:
         self.wallet["category"]["popular"][self.address["category"]["popular"][address]["wallet"]]["lasttxepoch"] = self.address["category"]["popular"][address]["lasttxepoch"] if self.address["category"]["popular"][address]["lasttxepoch"] > self.wallet["category"]["popular"][self.address["category"]["popular"][address]["wallet"]]["lasttxepoch"] else self.wallet["category"]["popular"][self.address["category"]["popular"][address]["wallet"]]["lasttxepoch"]
       elif self.address["category"]["popular"][address]["lasttxepoch"]:
@@ -291,11 +295,15 @@ class BTCTxsMon:
           "lasttxepoch": None,
           "address": 0,
         }
+      pprint(self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]])
+      pprint(self.address["category"]["ransom"][address])
       self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]]["transaction"] += self.address["category"]["ransom"][address]["transaction"]
       self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]]["balance"] += (self.address["category"]["ransom"][address]["balance"] / (10**8))
       self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]]["received"] += (self.address["category"]["ransom"][address]["received"] / (10**8))
       self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]]["sent"] += (self.address["category"]["ransom"][address]["sent"] / (10**8))
       self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]]["address"] += 1
+      if "lasttxepoch" not in self.address["category"]["ransom"][address]:
+        self.address["category"]["ransom"][address]["lasttxepoch"] = None
       if self.address["category"]["ransom"][address]["lasttxepoch"] and self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]]["lasttxepoch"]:
         self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]]["lasttxepoch"] = self.address["category"]["ransom"][address]["lasttxepoch"] if self.address["category"]["ransom"][address]["lasttxepoch"] > self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]]["lasttxepoch"] else self.wallet["category"]["ransom"][self.address["category"]["ransom"][address]["wallet"]]["lasttxepoch"]
       elif self.address["category"]["ransom"][address]["lasttxepoch"]:
