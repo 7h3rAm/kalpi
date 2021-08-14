@@ -180,6 +180,7 @@ def file_save(filename, data, mode="w"):
 
 def download(url, filename, timeout=5):
   res = requests.get(url, timeout=timeout)
+  print(url, res.status_code)
   if res.status_code == 200:
     open(filename, "wb").write(res.content)
     return filename
@@ -188,10 +189,12 @@ def download(url, filename, timeout=5):
 
 def get_http_res(url, headers={}):
   res = requests.get(cleanup_url(url), headers=headers)
+  print(url, res.status_code)
   return res
 
 def get_http(url, headers={}):
   res = requests.get(cleanup_url(url), headers=headers)
+  print(url, res.status_code)
   if res.status_code == 200:
     return res.json()
   else:
@@ -199,6 +202,7 @@ def get_http(url, headers={}):
 
 def post_http(url, data={}, headers={}):
   res = requests.post(cleanup_url(url), data=json.dumps(data), headers=headers)
+  print(url, res.status_code)
   if res.status_code == 200:
     return res.json()
   else:
