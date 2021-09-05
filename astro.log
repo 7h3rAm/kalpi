@@ -1,6 +1,6 @@
-https://apod.nasa.gov/apod/image/2108/IMG_20210813_143919_1024.jpg 200
-[1/14] https://epic.gsfc.nasa.gov/archive/natural/2021/08/13/jpg/epic_1b_20210813211054.jpg
-https://epic.gsfc.nasa.gov/archive/natural/2021/08/13/jpg/epic_1b_20210813211054.jpg 200
+https://apod.nasa.gov/apod/image/2109/DSC06988copy2_1024.jpg 200
+[1/14] https://epic.gsfc.nasa.gov/archive/natural/2021/09/03/jpg/epic_1b_20210903220342.jpg
+https://epic.gsfc.nasa.gov/archive/natural/2021/09/03/jpg/epic_1b_20210903220342.jpg 200
 [2/14] http://rammb.cira.colostate.edu/ramsdis/online/images/latest/himawari-8/full_disk_ahi_natural_color.jpg
 http://rammb.cira.colostate.edu/ramsdis/online/images/latest/himawari-8/full_disk_ahi_natural_color.jpg 200
 [3/14] http://rammb.cira.colostate.edu/ramsdis/online/images/latest/himawari-8/full_disk_ahi_true_color.jpg
@@ -28,34 +28,34 @@ https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMID.jpg 200
 [14/14] https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIC.jpg
 https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIC.jpg 200
 drwxr-xr-x shiv shiv     4 KB Tue Aug 10 13:11:35 2021 .
-drwxr-xr-x shiv shiv     4 KB Tue Aug 10 13:09:59 2021 ..
-drwxr-xr-x shiv shiv     4 KB Sat Aug 14 10:01:11 2021 .git
-.rw-r--r-- shiv shiv 430.9 KB Sat Aug 14 11:00:04 2021 apod.jpg
-.rw-r--r-- shiv shiv     2 MB Sat Aug 14 11:01:01 2021 astro.json
+drwxr-xr-x shiv shiv     4 KB Sun Aug 29 18:43:47 2021 ..
+drwxr-xr-x shiv shiv     4 KB Sat Sep  4 16:01:26 2021 .git
+.rw-r--r-- shiv shiv  66.4 KB Sat Sep  4 17:00:06 2021 apod.jpg
+.rw-r--r-- shiv shiv   1.9 MB Sat Sep  4 17:01:21 2021 astro.json
 .rw-r--r-- shiv shiv   180 KB Wed May 26 18:00:30 2021 b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf
-.rw-r--r-- shiv shiv   7.9 MB Sat Aug 14 10:49:38 2021 bitcoin.json
+.rw-r--r-- shiv shiv   6.5 MB Sat Sep  4 17:01:21 2021 bitcoin.json
 .rw-r--r-- shiv shiv   1.8 KB Fri Jul  9 09:04:08 2021 Bitcoin_evergreen.png
 .rw-r--r-- shiv shiv 135.2 KB Tue Aug 10 12:23:24 2021 btctxsmon.json
-.rw-r--r-- shiv shiv 232.4 KB Sat Aug 14 11:00:43 2021 dscovr_epic.jpg
+.rw-r--r-- shiv shiv 242.8 KB Sat Sep  4 17:00:51 2021 dscovr_epic.jpg
 .rw-r--r-- shiv shiv 517.7 KB Sun Jun 27 13:47:12 2021 e4e7a32bfd5946d972b5078dcbc540117252e244cbb408ee53b98bbd7b73098e.pdf
 .rw-r--r-- shiv shiv   3.1 MB Tue Jun  8 08:05:35 2021 earthview_hstack.gif
 .rw-r--r-- shiv shiv  29.1 MB Tue Jun  8 08:05:28 2021 earthview_vstack.gif
-.rw-r--r-- shiv shiv  29.1 KB Sat Aug 14 11:00:52 2021 elektrol.jpg
-.rw-r--r-- shiv shiv 646.3 KB Sat Aug 14 11:00:46 2021 goes16.jpg
-.rw-r--r-- shiv shiv 610.2 KB Sat Aug 14 11:00:47 2021 goes17.jpg
-.rw-r--r-- shiv shiv  55.8 KB Sat Aug 14 11:00:44 2021 himwari8_naturalcolor.jpg
-.rw-r--r-- shiv shiv   413 KB Sat Aug 14 11:00:45 2021 himwari8_truecolor.jpg
-.rw-r--r-- shiv shiv   317 KB Sat Aug 14 11:00:55 2021 insat_ir1.jpg
-.rw-r--r-- shiv shiv 277.7 KB Sat Aug 14 11:00:58 2021 insat_vis.jpg
+.rw-r--r-- shiv shiv  29.1 KB Sat Sep  4 17:00:58 2021 elektrol.jpg
+.rw-r--r-- shiv shiv 497.3 KB Sat Sep  4 17:00:54 2021 goes16.jpg
+.rw-r--r-- shiv shiv 589.3 KB Sat Sep  4 17:00:54 2021 goes17.jpg
+.rw-r--r-- shiv shiv 260.7 KB Sat Sep  4 17:00:52 2021 himwari8_naturalcolor.jpg
+.rw-r--r-- shiv shiv   507 KB Sat Sep  4 17:00:53 2021 himwari8_truecolor.jpg
+.rw-r--r-- shiv shiv 321.3 KB Sat Sep  4 17:01:03 2021 insat_ir1.jpg
+.rw-r--r-- shiv shiv 257.2 KB Sat Sep  4 17:01:07 2021 insat_vis.jpg
 .rw-r--r-- shiv shiv  20.4 KB Wed Jun  9 00:41:06 2021 iss_dark.png
 .rw-r--r-- shiv shiv  91.4 KB Wed Jun  9 00:40:11 2021 iss_light.png
 drwxr-xr-x shiv shiv     4 KB Fri Jun 11 09:24:56 2021 maps
-.rw-r--r-- shiv shiv 192.5 KB Sat Aug 14 11:00:49 2021 meteosat0.jpg
-.rw-r--r-- shiv shiv 135.7 KB Sat Aug 14 11:00:50 2021 meteosat415.jpg
-.rw-r--r-- shiv shiv 157.1 KB Sat Aug 14 11:00:59 2021 sdo_0171.jpg
-.rw-r--r-- shiv shiv 207.4 KB Sat Aug 14 11:00:59 2021 sdo_0304.jpg
-.rw-r--r-- shiv shiv 276.2 KB Sat Aug 14 11:01:00 2021 sdo_hmid.jpg
-.rw-r--r-- shiv shiv 228.9 KB Sat Aug 14 11:01:01 2021 sdo_hmiic.jpg
+.rw-r--r-- shiv shiv 100.7 KB Sat Sep  4 17:00:56 2021 meteosat0.jpg
+.rw-r--r-- shiv shiv 108.9 KB Sat Sep  4 17:00:57 2021 meteosat415.jpg
+.rw-r--r-- shiv shiv 161.7 KB Sat Sep  4 17:01:09 2021 sdo_0171.jpg
+.rw-r--r-- shiv shiv 211.5 KB Sat Sep  4 17:01:13 2021 sdo_0304.jpg
+.rw-r--r-- shiv shiv 280.6 KB Sat Sep  4 17:01:17 2021 sdo_hmid.jpg
+.rw-r--r-- shiv shiv 236.1 KB Sat Sep  4 17:01:21 2021 sdo_hmiic.jpg
 .rw-r--r-- shiv shiv   3.3 KB Mon Jul 26 17:12:43 2021 tools.yml
 On branch master
 Your branch is up to date with 'github/master'.
@@ -66,10 +66,10 @@ Changes not staged for commit:
 	modified:   astro.json
 	modified:   bitcoin.json
 	modified:   goes16.jpg
-	modified:   goes17.jpg
 	modified:   himwari8_naturalcolor.jpg
 	modified:   himwari8_truecolor.jpg
 	modified:   insat_ir1.jpg
+	modified:   insat_vis.jpg
 	modified:   meteosat0.jpg
 	modified:   meteosat415.jpg
 	modified:   sdo_0171.jpg
@@ -78,20 +78,4 @@ Changes not staged for commit:
 	modified:   sdo_hmiic.jpg
 
 no changes added to commit (use "git add" and/or "git commit -a")
-[master b6ddbdb3] 🔧  tl;dr
- 13 files changed, 13297 insertions(+), 13232 deletions(-)
- rewrite goes16.jpg (90%)
- rewrite goes17.jpg (91%)
- rewrite himwari8_naturalcolor.jpg (99%)
- rewrite himwari8_truecolor.jpg (94%)
- rewrite insat_ir1.jpg (92%)
- rewrite meteosat0.jpg (97%)
- rewrite meteosat415.jpg (98%)
- rewrite sdo_0171.jpg (97%)
- rewrite sdo_0304.jpg (96%)
- rewrite sdo_hmid.jpg (96%)
- rewrite sdo_hmiic.jpg (96%)
-To github.com:7h3rAm/datastore.git
-   6b9501ff..b6ddbdb3  master -> master
-Branch 'master' set up to track remote branch 'master' from 'github'.
-astro - last_update: "14/Aug/2021 @ 11:01:01 PDT"
+astro - last_update: "04/Sep/2021 @ 17:01:21 PDT"

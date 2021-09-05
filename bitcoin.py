@@ -10,6 +10,31 @@ import csv
 
 import utils
 
+"""
+http://172.16.1.48:3006/api/v1/blocks/tip/height
+http://172.16.1.48:3006/api/v1/block-height/695148
+http://172.16.1.48:3006/api/v1/block/000000000000000015dc777b3ff2611091336355d3f0ee9766a2cf3be8e4b1ce
+http://172.16.1.48:3006/api/v1/block/000000000000000015dc777b3ff2611091336355d3f0ee9766a2cf3be8e4b1ce/txids
+http://172.16.1.48:3006/api/v1/block/000000000000000015dc777b3ff2611091336355d3f0ee9766a2cf3be8e4b1ce/txs
+http://172.16.1.48:3006/api/v1/blocks
+http://172.16.1.48:3006/api/v1/difficulty-adjustment
+http://172.16.1.48:3006/api/v1/fees/mempool-blocks
+http://172.16.1.48:3006/api/v1/fees/recommended
+http://172.16.1.48:3006/api/v1/mempool/txids
+http://172.16.1.48:3006/api/v1/mempool/recent
+http://172.16.1.48:3006/api/v1/tx/15e10745f15593a899cef391191bdd3d7c12412cc4696b7bcb669d0feadc8521
+http://172.16.1.48:3006/api/v1/tx/15e10745f15593a899cef391191bdd3d7c12412cc4696b7bcb669d0feadc8521/status
+
+https://api.coinpaprika.com/v1/tickers/btc-bitcoin
+https://chain.so/api/v2/get_address_balance
+https://chain.so/api/v2/get_tx_received
+
+https://api.github.com/repos/7h3rAm/writeups
+https://check.torproject.org/api/ip
+https://ifconfig.me/all.json
+http://ip-api.com/json/108.193.5.5
+"""
+
 
 class Bitcoin:
   def __init__(self):
@@ -282,7 +307,8 @@ class Bitcoin:
   def update(self, skipupdate=False):
     self.load_from_csv()
     self.get_bitnodes()
-    self.bitcoin["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+    self.bitcoin["last_update_epoch"] = datetime.now().astimezone(tz=None)
+    self.bitcoin["last_update"] = self.bitcoin["last_update_epoch"].strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.bitcoin, self.statsfilepath)
     if not skipupdate:
       for category in ["donation", "popular", "ransom"]:
@@ -362,48 +388,11 @@ class Bitcoin:
           self.bitcoin["nodessummary"]["useragent"][useragent] = 1
         else:
           self.bitcoin["nodessummary"]["useragent"][useragent] += 1
+    self.bitcoin["stats"]["count_nodes"] = len(self.bitcoin["nodes"])
     self.bitcoin["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.bitcoin, self.statsfilepath)
 
-  def group_and_update(self):
-    self.bitcoin["category"] = {
-      "donation": {},
-      "popular": {},
-      "ransom": {},
-    }
-    self.bitcoin["stats"] = {
-      "count_address": 0,
-      "count_wallet": 0,
-      "count_received": 0,
-      "count_sent": 0,
-      "count_balance": 0,
-      "count_txs": 0,
-      "donation": {
-        "count_wallet": 0,
-        "count_address": 0,
-        "count_received": 0,
-        "count_sent": 0,
-        "count_balance": 0,
-        "count_txs": 0,
-      },
-      "popular": {
-        "count_wallet": 0,
-        "count_address": 0,
-        "count_received": 0,
-        "count_sent": 0,
-        "count_balance": 0,
-        "count_txs": 0,
-      },
-      "ransom": {
-        "count_wallet": 0,
-        "count_address": 0,
-        "count_received": 0,
-        "count_sent": 0,
-        "count_balance": 0,
-        "count_txs": 0,
-      },
-    }
-
+  def group_and_update(self, categories=["donation", "popular", "ransom"]):
     with open("%s/toolbox/bootstrap/btcpaymon.csv" % (utils.expand_env(var="$HOME"))) as csvfile:
       self.addresses = {
         "category": {
@@ -427,7 +416,14 @@ class Bitcoin:
             "source": source,
           }
 
-    for category in ["donation", "popular", "ransom"]:
+    for category in categories:
+      self.bitcoin["category"][category] = {}
+      self.bitcoin["stats"][category]["count_wallet"] = 0
+      self.bitcoin["stats"][category]["count_address"] = 0
+      self.bitcoin["stats"][category]["count_received"] = 0
+      self.bitcoin["stats"][category]["count_sent"] = 0
+      self.bitcoin["stats"][category]["count_balance"] = 0
+      self.bitcoin["stats"][category]["count_txs"] = 0
       print("grouping %d addresses in %s category" % (len(self.addresses["category"][category]), category))
       for address in self.addresses["category"][category]:
         wallet = self.addresses["category"][category][address]["wallet"]
@@ -451,13 +447,15 @@ class Bitcoin:
         else:
           self.bitcoin["category"][category][wallet]["addresses"].append(address)
 
-    for category in ["ransom", "donation", "popular"]:
-    #for category in ["ransom"]:
+    for category in categories:
       print("updating %d wallets in %s category" % (len(self.bitcoin["category"][category]), category))
       for wallet in self.bitcoin["category"][category]:
-        # https://www.blockchain.com/api/blockchain_api
-        stats = utils.get_http("https://blockchain.info/multiaddr?active=%s" % ("|".join(self.bitcoin["category"][category][wallet]["addresses"])))
-        if "addresses" in stats:
+        try:
+          # https://www.blockchain.com/api/blockchain_api
+          stats = utils.get_http("https://blockchain.info/multiaddr?active=%s" % ("|".join(self.bitcoin["category"][category][wallet]["addresses"])))
+        except:
+          stats= None
+        if stats and "addresses" in stats:
           self.bitcoin["category"][category][wallet]["addrstats"] = []
           for entry in stats["addresses"]:
             self.bitcoin["category"][category][wallet]["addrstats"].append({
@@ -507,58 +505,185 @@ class Bitcoin:
     utils.save_json(self.bitcoin, self.statsfilepath)
 
   def wallet_graph(self):
+    def sat2btc(sat):
+      return sat/10**8
+
+    def sat2size(sat):
+      sizemap = {
+        1: 10,
+        10: 15,
+        100: 20,
+        1000: 25,
+        10000: 30,
+        100000: 35,
+        1000000: 40,
+        10000000: 45,
+        100000000: 50,
+      }
+      btc = sat2btc(sat)
+      for maxbtc in sizemap:
+        if btc <= maxbtc:
+          return sizemap[maxbtc]
+
+    grouplimits = {
+      "₿1":     {"min": 0, "max": 1},
+      "₿10":    {"min": 1, "max": 10},
+      "₿100":   {"min": 10, "max": 100},
+      "₿1k":    {"min": 100, "max": 1000},
+      "₿10k":   {"min": 1000, "max": 10000},
+      "₿100k":  {"min": 10000, "max": 100000},
+      "₿1m":    {"min": 100000, "max": 1000000},
+      "₿10m":   {"min": 1000000, "max": 10000000},
+      "₿100m":   {"min": 10000000, "max": 100000000},
+    }
+
+    groupingcriteria = "received"
+    defaultnodesize = 20
+    defaultfillcolor = "#dedede"
+    rootfillcolor = "#c3daf7"
+    edgecolor = "#dddddd"
+    nodecolor = "#f6f6f6"
+    categoryfillcolors = {
+      "donation": "#d7ecc9",
+      "popular": "#fed9b5",
+      "ransom": "#fbbfc5",
+    }
+
     self.bitcoin["graph"] = {
       "grouped": {
-        "inlabel": "",
+        "inlabel": self.bitcoin["stats"]["count_wallet"],
         "outlabel": "💼 Wallets",
-        "size": 20,
-        "edgecolor": "#cccccc",
-        "bordercolor": "#f6f6f6",
-        "fillcolor": "#dedede",
-        "tooltip": "Stats for Bitcoin wallets catgeorized as Donation/Popular/Ransom and monitored daily",
-        "children": [
-          {
-            "inlabel": None,
-            "outlabel": "🙏 Donation",
-            "size": 20,
-            "edgecolor": "#cccccc",
-            "bordercolor": "#f6f6f6",
-            "fillcolor": "#d7ecc9",
-            "tooltip": None,
-            "children": []
-          },
-          {
-            "inlabel": None,
-            "outlabel": "🔥 Popular",
-            "size": 20,
-            "edgecolor": "#cccccc",
-            "bordercolor": "#f6f6f6",
-            "fillcolor": "#fed9b5",
-            "tooltip": None,
-            "children": []
-          },
-          {
-            "inlabel": None,
-            "outlabel": "👾 Ransom",
-            "size": 20,
-            "edgecolor": "#cccccc",
-            "bordercolor": "#f6f6f6",
-            "fillcolor": "#fbbfc5",
-            "tooltip": None,
-            "children": []
-          }
-        ]
+        "size": defaultnodesize,
+        "edgecolor": edgecolor,
+        "fillcolor": rootfillcolor,
+        "tooltip": "", #"₿%.8f/₿%.8f/₿%.8f" % (sat2btc(self.bitcoin["stats"]["count_received"]), sat2btc(self.bitcoin["stats"]["count_sent"]), sat2btc(self.bitcoin["stats"]["count_balance"])),
+        "donation": {
+          "inlabel": None,
+          "outlabel": "🙏 Donation",
+          "size": defaultnodesize,
+          "edgecolor": edgecolor,
+          "fillcolor": categoryfillcolors["donation"],
+          "tooltip": None,
+          "₿1": [],
+          "₿10": [],
+          "₿100": [],
+          "₿1k": [],
+          "₿10k": [],
+          "₿100k": [],
+          "₿1m": [],
+          "₿10m": [],
+          "children": []
+        },
+        "popular": {
+          "inlabel": None,
+          "outlabel": "🔥 Popular",
+          "size": defaultnodesize,
+          "edgecolor": edgecolor,
+          "fillcolor": categoryfillcolors["popular"],
+          "tooltip": None,
+          "₿1": [],
+          "₿10": [],
+          "₿100": [],
+          "₿1k": [],
+          "₿10k": [],
+          "₿100k": [],
+          "₿1m": [],
+          "₿10m": [],
+          "children": []
+        },
+        "ransom": {
+          "inlabel": None,
+          "outlabel": "👾 Ransom",
+          "size": defaultnodesize,
+          "edgecolor": edgecolor,
+          "fillcolor": categoryfillcolors["ransom"],
+          "tooltip": None,
+          "₿1": [],
+          "₿10": [],
+          "₿100": [],
+          "₿1k": [],
+          "₿10k": [],
+          "₿100k": [],
+          "₿1m": [],
+          "₿10m": [],
+          "children": []
+        },
+        "children": []
       }
     }
 
-    self.bitcoin["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
+    for category in ["donation", "popular", "ransom"]:
+      print("gathering stats for %d wallets in %s category" % (len(self.bitcoin["category"][category]), category))
+      for wallet in self.bitcoin["category"][category]:
+        for fundgroup in grouplimits:
+          if sat2btc(self.bitcoin["category"][category][wallet][groupingcriteria]) > grouplimits[fundgroup]["min"] and sat2btc(self.bitcoin["category"][category][wallet][groupingcriteria]) <= grouplimits[fundgroup]["max"]:
+            self.bitcoin["graph"]["grouped"][category][fundgroup].append({
+              "inlabel": "",
+              "outlabel": wallet,
+              "size": defaultnodesize, #sat2size(self.bitcoin["category"][category][wallet][groupingcriteria]),
+              "edgecolor": edgecolor,
+              "nodecolor": nodecolor,
+              "fillcolor": categoryfillcolors[category] if self.bitcoin["category"][category][wallet]["balance"] > 0 else defaultfillcolor,
+              "tooltip": "₿%.8f/₿%.8f/₿%.8f" % (sat2btc(self.bitcoin["category"][category][wallet]["received"]), sat2btc(self.bitcoin["category"][category][wallet]["sent"]), sat2btc(self.bitcoin["category"][category][wallet]["balance"])),
+              "lastactivity": self.bitcoin["category"][category][wallet]["lasttx"]["epochhuman"],
+              "children": [],
+            })
+      print("grouping wallets using criteria '%s'" % groupingcriteria)
+      for fundgroup in grouplimits:
+        if fundgroup in self.bitcoin["graph"]["grouped"][category]:
+          if len(self.bitcoin["graph"]["grouped"][category][fundgroup]):
+            self.bitcoin["graph"]["grouped"][category]["children"].append({
+              "inlabel": len(self.bitcoin["graph"]["grouped"][category][fundgroup]),
+              "outlabel": "<=%s" % (fundgroup),
+              "size": defaultnodesize,
+              "edgecolor": edgecolor,
+              "nodecolor": nodecolor,
+              "fillcolor": categoryfillcolors[category],
+              "tooltip": "",
+              "children": self.bitcoin["graph"]["grouped"][category][fundgroup],
+            })
+          del self.bitcoin["graph"]["grouped"][category][fundgroup]
+
+    self.bitcoin["graph"]["grouped"]["children"].append({
+      "inlabel": self.bitcoin["stats"]["donation"]["count_wallet"],
+      "outlabel": "🙏 Donation",
+      "size": defaultnodesize,
+      "edgecolor": edgecolor,
+      "nodecolor": nodecolor,
+      "fillcolor": categoryfillcolors["donation"],
+      "tooltip": "", #"₿%.8f/₿%.8f/₿%.8f" % (sat2btc(self.bitcoin["stats"]["donation"]["count_received"]), sat2btc(self.bitcoin["stats"]["donation"]["count_sent"]), sat2btc(self.bitcoin["stats"]["donation"]["count_balance"])),
+      "children": self.bitcoin["graph"]["grouped"]["donation"]["children"],
+    })
+    del self.bitcoin["graph"]["grouped"]["donation"]
+    self.bitcoin["graph"]["grouped"]["children"].append({
+      "inlabel": self.bitcoin["stats"]["popular"]["count_wallet"],
+      "outlabel": "🔥 Popular",
+      "size": defaultnodesize,
+      "edgecolor": edgecolor,
+      "nodecolor": nodecolor,
+      "fillcolor": categoryfillcolors["popular"],
+      "tooltip": "", #"₿%.8f/₿%.8f/₿%.8f" % (sat2btc(self.bitcoin["stats"]["popular"]["count_received"]), sat2btc(self.bitcoin["stats"]["popular"]["count_sent"]), sat2btc(self.bitcoin["stats"]["popular"]["count_balance"])),
+      "children": self.bitcoin["graph"]["grouped"]["popular"]["children"],
+    })
+    del self.bitcoin["graph"]["grouped"]["popular"]
+    self.bitcoin["graph"]["grouped"]["children"].append({
+      "inlabel": self.bitcoin["stats"]["ransom"]["count_wallet"],
+      "outlabel": "👾 Ransom",
+      "size": defaultnodesize,
+      "edgecolor": edgecolor,
+      "nodecolor": nodecolor,
+      "fillcolor": categoryfillcolors["ransom"],
+      "tooltip": "", #"₿%.8f/₿%.8f/₿%.8f" % (sat2btc(self.bitcoin["stats"]["ransom"]["count_received"]), sat2btc(self.bitcoin["stats"]["ransom"]["count_sent"]), sat2btc(self.bitcoin["stats"]["ransom"]["count_balance"])),
+      "children": self.bitcoin["graph"]["grouped"]["ransom"]["children"],
+    })
+    del self.bitcoin["graph"]["grouped"]["ransom"]
+
+    self.bitcoin["last_update_epoch"] = datetime.now().timestamp(); self.bitcoin["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
     utils.save_json(self.bitcoin, self.statsfilepath)
 
 
 if __name__ == "__main__":
   bitcoin = Bitcoin()
-  #bitcoin.get_bitnodes()
-  #bitcoin.group_and_update()
-
+  bitcoin.group_and_update()
   bitcoin.wallet_graph()
-  pprint(bitcoin.bitcoin["graph"]["grouped"])
+  bitcoin.get_bitnodes()
