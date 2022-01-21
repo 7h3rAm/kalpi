@@ -1,10 +1,12 @@
 #!/usr/bin/env zsh
 
-source /home/shiv/.zshrc
+source $HOME/.zshrc
 
-python3 /run/media/shiv/1tb/shared/projects/kalpi/bitcoin.py
+discord.sh "[`basename $0`] daily sync started"
 
-messages=$(cat /home/shiv/toolbox/bootstrap/commit_messages.txt)
+python3 ${PROJECTSPATH}/kalpi/bitcoin.py
+
+messages=$(cat $HOME/toolbox/bootstrap/commit_messages.txt)
 num_messages=$(echo "$messages" | wc -l)
 random_index=$[RANDOM % num_messages + 1]
 msg=$(echo "$messages" | head -$random_index | tail -1)
@@ -12,6 +14,8 @@ emojis=( ⏳ ♻️ ⚗️ ⚡ ✅ ✨ ⬆️ ⬇️ ⭐ 🍎 🍒 🎉 🎨 �
 rand=$[$RANDOM % ${#emojis[@]}]
 emj=$(echo ${emojis[$rand]})
 
-cd /run/media/shiv/1tb/shared/projects/datastore && git status && git add . && git commit -m "${emj}  ${msg}" && git push -u
+cd ${PROJECTSPATH}/datastore && git status && git add . && git commit -m "${emj}  ${msg}" && git push -u
 
-echo -en "bitcoin - last_update: " ; cat /run/media/shiv/1tb/shared/projects/datastore/bitcoin.json | jq '.last_update'
+echo -en "bitcoin - last_update: " ; cat ${PROJECTSPATH}/datastore/bitcoin.json | jq '.last_update'
+
+discord.sh "[`basename $0`] daily sync completed"

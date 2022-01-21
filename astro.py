@@ -122,7 +122,7 @@ class Astro:
       "date": datetime.now().astimezone(tz=None).strftime("%d/%b/%Y %Z"),
       "events": [],
     }
-    eonetjson = utils.download_json("https://eonet.sci.gsfc.nasa.gov/api/v3/events?status=open&days=30")
+    eonetjson = utils.download_json("https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=30")
     usgseqjson = utils.download_json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson")
     self.data["earthevents"]["mapdata"] = {
       "Drought": [],
@@ -500,6 +500,8 @@ class Astro:
     starlinkjson = utils.download_json("https://api.spacexdata.com/v4/starlink")
     locs, epochs = [], []
     for starlink in starlinkjson:
+      if not starlink["spaceTrack"]["LAUNCH_DATE"]:
+        break
       self.data["spacex"]["starlink"]["stats"]["total"] += 1
       epochs.append(datetime.strptime(starlink["spaceTrack"]["LAUNCH_DATE"], "%Y-%m-%d").timestamp())
       if starlink["latitude"] and starlink["longitude"]:

@@ -8,6 +8,7 @@ import codecs
 import locale
 import fnmatch
 import datetime
+import urllib.parse
 import urllib.request
 
 import requests
@@ -127,8 +128,10 @@ def search_files_md(dirpath):
   return search_files(dirpath, regex="*.md")
 
 def download_json(url):
-  with urllib.request.urlopen(url) as url:
-    return json.loads(url.read().decode())
+  res = requests.get(url)
+  if res.status_code == 200:
+    return res.json()
+  return None
 
 def load_json(filename):
   with open(filename) as fp:
