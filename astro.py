@@ -88,11 +88,12 @@ class Astro:
       "archiveurl": "https://apod.nasa.gov/apod/archivepix.html",
     }
     apodjson = utils.download_json("https://api.nasa.gov/planetary/apod?api_key=%s" % (self.apikey))
-    self.data["apod"]["title"] = "%s (%s)" % (apodjson["title"], datetime.strptime(apodjson["date"], '%Y-%m-%d').astimezone(tz=None).strftime("%d/%b/%Y %Z"))
-    self.data["apod"]["source"] = apodjson["url"]
-    self.data["apod"]["datastore"] = "%s/apod.jpg" % (self.datastore_url)
-    self.downloads[self.data["apod"]["source"]] = "%s/apod.jpg" % (self.datastore_path)
-    utils.download(self.data["apod"]["source"], self.downloads[self.data["apod"]["source"]])
+    if apodjson:
+      self.data["apod"]["title"] = "%s (%s)" % (apodjson["title"], datetime.strptime(apodjson["date"], '%Y-%m-%d').astimezone(tz=None).strftime("%d/%b/%Y %Z"))
+      self.data["apod"]["source"] = apodjson["url"]
+      self.data["apod"]["datastore"] = "%s/apod.jpg" % (self.datastore_url)
+      self.downloads[self.data["apod"]["source"]] = "%s/apod.jpg" % (self.datastore_path)
+      utils.download(self.data["apod"]["source"], self.downloads[self.data["apod"]["source"]])
     self.data["apod"]["last_update"] = datetime.now().astimezone(tz=None).strftime("%d/%b/%Y @ %H:%M:%S %Z")
 
   def neo(self):
