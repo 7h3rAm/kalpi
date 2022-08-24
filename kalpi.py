@@ -22,7 +22,7 @@ class Kalpi:
 
     self.datadict["tags"] = {}
     self.datadict["posts"] = {}
-    self.datadict["recent_count"] = 5
+    self.datadict["recent_count"] = 10
     self.basedir = "%s/7h3rAm.github.io" % (utils.expand_env(var="$PROJECTSPATH"))
     self.outputdir = self.basedir
     self.postsdir = "%s/_posts" % (self.basedir)
