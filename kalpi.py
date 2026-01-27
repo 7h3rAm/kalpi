@@ -48,6 +48,7 @@ class Kalpi:
       "archive.html": "%s/archive.html" % (self.outputdir),
       "tags.html": "%s/tags.html" % (self.outputdir),
       "stats.html": "%s/stats.html" % (self.outputdir),
+      "feed.xml": "%s/feed.xml" % (self.outputdir),
 
       "cv.html": "%s/pages/cv.html" % (self.outputdir),
       "fitness.html": "%s/pages/fitness.html" % (self.outputdir),
@@ -202,6 +203,14 @@ class Kalpi:
         break
     return date, summary, tags, content
 
+  def reading_time_bar(self, minutes, maxsize=10):
+    """Generate a Unicode block bar for reading time"""
+    # max reading time we'll show is 30 minutes
+    max_minutes = 30
+    filled = min(maxsize, int((minutes / max_minutes) * maxsize))
+    bar = "█" * filled + "░" * (maxsize - filled)
+    return '<span style="color:var(--muted); font-family:monospace;" title="%d min read">%s</span>' % (minutes, bar)
+
   def sparkify(self, content, maxsize=10, unique=True, sparkmode=True):
     sparkid = hashlib.sha256(content.encode("utf-8")).hexdigest()
     spark = "".join(sparkline.sparkify([int(x, base=16) for x in sparkid]))
@@ -223,7 +232,7 @@ class Kalpi:
       chars = ["▣", "►", "◐", "◧", "▤", "▼", "◑", "◨", "▥", "◀", "◒", "◩", "▦", "◆", "◕", "◪", "▧", "◈", "◢", "■", "▨", "◉", "◣", "▩", "◎", "◤", "▲", "●", "◥"]
       sparkcolored = "".join(['<span style="color:%s;">%s</span>' % (random.choice(colors), random.choice(chars)) for _ in range(len(sparkid[:maxsize]))])
       sparkcoloredlong = "".join(['<span style="color:%s;">%s</span>' % (random.choice(colors), random.choice(chars)) for _ in range(len(sparkid))])
-    return ('<span class="sparklines">%s</span>' % (sparkcolored), '<span class="sparklines">%s</span>' % (sparkcoloredlong))
+    return ('<span class="sparklines" title="%s">%s</span>' % (sparkid, sparkcolored), '<span class="sparklines" title="%s">%s</span>' % (sparkid, sparkcoloredlong))
 
   def get_tree(self, source):
     posts = []
@@ -234,7 +243,7 @@ class Kalpi:
         if not re.match(r"^.+\.(md|mdown|markdown)$", name): continue
         path = os.path.join(root, name)
         with open(path, "r") as f:
-          title = f.readline()[:-1].strip("\n..")
+          title = f.readline()[:-1].strip("\n..").rstrip(":")
           contentmd = self.preprocess_text(f.readlines())
           date, summary, tags, content = self.parse(contentmd)
           year, month, day = date[:3]
@@ -242,6 +251,17 @@ class Kalpi:
           epoch = time.mktime(date)
           url = "/posts/%d%02d%02d_%s.html" % (year, month, day, os.path.splitext(name)[0])
           sparkcolored, sparkcoloredlong = self.sparkify("\n".join(contentmd))
+
+          # calculate word count and reading time early
+          content_text = "".join(contentmd)
+          code_blocks_count = len(re.findall(r'```', content_text)) // 2
+          text_without_code = re.sub(r'```.*?```', '', content_text, flags=re.DOTALL)
+          word_count = len(text_without_code.split())
+          reading_time = max(1, int(word_count / 200))
+          reading_bar = self.reading_time_bar(reading_time)
+
+          # RFC 822 date format for RSS
+          rss_date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", date)
 
           post = {
             "title": title,
@@ -260,6 +280,10 @@ class Kalpi:
             "filename": name,
             "sparkline": sparkcolored,
             "sparklinelong": sparkcoloredlong,
+            "reading_time": reading_time,
+            "reading_bar": reading_bar,
+            "word_count": word_count,
+            "rss_date": rss_date,
             "previous": None,
             "next": None,
           }
@@ -268,6 +292,7 @@ class Kalpi:
             if tag not in self.datadict["tags"].keys():
               self.datadict["tags"][tag] = [{
                 "title": title,
+                "tags": tags,
                 "sparkline": sparkcolored,
                 "sparklinelong": sparkcoloredlong,
                 "summary": summary,
@@ -280,6 +305,7 @@ class Kalpi:
             else:
               self.datadict["tags"][tag].append({
                 "title": title,
+                "tags": tags,
                 "sparkline": sparkcolored,
                 "sparklinelong": sparkcoloredlong,
                 "summary": summary,
@@ -290,6 +316,55 @@ class Kalpi:
                 "day": day,
               })
     return posts
+
+  def gen_activity_heatmap(self, stats):
+    """Generate activity heat map using Unicode blocks"""
+    # get all dates
+    post_dates = {}
+    for date_str in stats["dates"]:
+      post_dates[date_str] = post_dates.get(date_str, 0) + 1
+
+    # group by year-month
+    months = {}
+    for date_str in stats["dates"]:
+      ym = date_str[:6]  # YYYYMM
+      months[ym] = months.get(ym, 0) + 1
+
+    # create heat map
+    heatmap = []
+    years = sorted(set(d[:4] for d in stats["dates"]))
+
+    for year in years:
+      year_line = year + " "
+      for month in range(1, 13):
+        ym = "%s%02d" % (year, month)
+        count = months.get(ym, 0)
+        if count == 0:
+          char = "░"
+        elif count == 1:
+          char = "▒"
+        elif count <= 3:
+          char = "▓"
+        else:
+          char = "█"
+        year_line += char
+      heatmap.append(year_line)
+
+    heatmap.append("      JFMAMJJASOND")
+    return "\n".join(heatmap)
+
+  def gen_tag_distribution(self, stats):
+    """Generate tag distribution bar chart using Unicode blocks"""
+    bars = []
+    max_count = max(stats["groups"]["per_tag"][tag]["posts"] for tag in stats["groups"]["per_tag"])
+
+    for tag in sorted(stats["groups"]["per_tag"].keys(), key=lambda t: stats["groups"]["per_tag"][t]["posts"], reverse=True)[:10]:
+      count = stats["groups"]["per_tag"][tag]["posts"]
+      bar_length = int((count / max_count) * 20)
+      bar = "█" * bar_length
+      bars.append("%10s %s" % (tag[:10], bar))
+
+    return "\n".join(bars)
 
   def gen_stats(self):
     stats = {}
@@ -305,6 +380,9 @@ class Kalpi:
       "end_year": 2000,
     }
     stats["dates"] = []
+    stats["word_counts"] = []
+    stats["code_blocks"] = []
+    stats["post_details"] = []
 
     for post in self.datadict["posts"]:
       if post["year"] < stats["duration"]["start_year"]:
@@ -313,6 +391,31 @@ class Kalpi:
         stats["duration"]["end_year"] = post["year"]
 
       stats["dates"].append("%04d%02d%02d" % (post["year"], post["month"], post["day"]))
+
+      # calculate word count (excluding code blocks)
+      content_text = "".join(post["contentmd"])
+      code_blocks = len(re.findall(r'```', content_text)) // 2
+      text_without_code = re.sub(r'```.*?```', '', content_text, flags=re.DOTALL)
+      word_count = len(text_without_code.split())
+
+      # calculate reading time (avg 200 words per minute)
+      reading_time = max(1, int(word_count / 200))
+
+      stats["word_counts"].append(word_count)
+      stats["code_blocks"].append(code_blocks)
+      stats["post_details"].append({
+        "title": post["title"],
+        "url": post["url"],
+        "words": word_count,
+        "code_blocks": code_blocks,
+        "tags_count": len(post["tags"]),
+        "date": "%04d-%02d-%02d" % (post["year"], post["month"], post["day"]),
+        "reading_time": reading_time
+      })
+
+      # add reading time to post
+      post["reading_time"] = reading_time
+      post["word_count"] = word_count
 
       key = "%04d%02d" % (post["year"], post["month"])
       if key not in stats["groups"]["per_yyyymm"]:
@@ -366,14 +469,41 @@ class Kalpi:
     rd2 = dateutil.relativedelta.relativedelta (curdate, maxdate)
     rd3 = dateutil.relativedelta.relativedelta (curdate, mindate)
 
-    stats["summary"] = []
-    stats["summary"].append("There are a total of `%d` posts with `%d` tags, written over a period of `%dy%dm%dd` (from `%s` till `%s`)" % (stats["count_posts"], stats["count_tags"], rd1.years, rd1.months, rd1.days, datetime.strftime(mindate, "%d/%b/%Y"), datetime.strftime(maxdate, "%d/%b/%Y")))
-    stats["summary"].append("From the most recent update (on `%s`), it's been `%dy%dm%dd` when the last post was published and `%dy%dm%dd` since the first post" % (datetime.strftime(curdate, "%d/%b/%Y"), rd2.years, rd2.months, rd2.days, rd3.years, rd3.months, rd3.days))
-    stats["summary"].append("The year `%s` has highest number of posts with a count of `%d`, while the year `%s` has lowest number of posts with a count of `%d`" % (stats["max_posts_yyyy"], stats["groups"]["per_yyyy"][stats["max_posts_yyyy"]]["posts"], stats["min_posts_yyyy"], stats["groups"]["per_yyyy"][stats["min_posts_yyyy"]]["posts"]))
-    stats["summary"].append("The year `%s` has highest number of tags with a count of `%d`, while the year `%s` has lowest number of tags with a count of `%d`" % (stats["max_tags_yyyy"], len(stats["groups"]["per_yyyy"][stats["max_tags_yyyy"]]["tagslist"]), stats["min_tags_yyyy"], len(stats["groups"]["per_yyyy"][stats["min_tags_yyyy"]]["tagslist"])))
-    stats["summary"].append("The most widely used of all `%d` tags across `%d` posts is `%s` while the least used is `%s`" % (stats["count_tags"], stats["count_posts"], stats["most_used_tag"], stats["least_used_tag"]))
-    stats["summary"].append("On an average, there are `%d` posts per tag and `%d` posts, `%d` tags per year" % (sum([stats["groups"]["per_tag"][x]["posts"] for x in stats["groups"]["per_tag"]])/len(stats["groups"]["per_tag"].keys()), sum([stats["groups"]["per_yyyy"][x]["posts"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys()), sum([len(stats["groups"]["per_yyyy"][x]["tagslist"]) for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys())))
-    stats["summary"] = [self.md2html(x).replace("<p>", "").replace("</p>", "") for x in stats["summary"]]
+    # word count statistics
+    total_words = sum(stats["word_counts"])
+    avg_words = int(total_words / len(stats["word_counts"])) if stats["word_counts"] else 0
+    min_words = min(stats["word_counts"]) if stats["word_counts"] else 0
+    max_words = max(stats["word_counts"]) if stats["word_counts"] else 0
+    total_code_blocks = sum(stats["code_blocks"])
+
+    # find longest and shortest posts
+    longest_post = max(stats["post_details"], key=lambda x: x["words"])
+    shortest_post = min(stats["post_details"], key=lambda x: x["words"])
+
+    # store simplified stats for template
+    stats["writing_period"] = "%dy%dm%dd" % (rd1.years, rd1.months, rd1.days)
+    stats["first_post_date"] = datetime.strftime(mindate, "%d/%b/%Y")
+    stats["last_post_date"] = datetime.strftime(maxdate, "%d/%b/%Y")
+    stats["days_since_last"] = (curdate - maxdate).days
+    stats["avg_posts_per_year"] = int(sum([stats["groups"]["per_yyyy"][x]["posts"] for x in stats["groups"]["per_yyyy"]])/len(stats["groups"]["per_yyyy"].keys()))
+    stats["avg_posts_per_tag"] = int(sum([stats["groups"]["per_tag"][x]["posts"] for x in stats["groups"]["per_tag"]])/len(stats["groups"]["per_tag"].keys()))
+
+    # generate visualizations
+    stats["activity_heatmap"] = self.gen_activity_heatmap(stats)
+    stats["tag_distribution"] = self.gen_tag_distribution(stats)
+
+    # generate content metrics
+    stats["content_metrics"] = {
+      "total_words": total_words,
+      "avg_words": avg_words,
+      "min_words": min_words,
+      "max_words": max_words,
+      "total_code_blocks": total_code_blocks,
+      "longest_post": longest_post,
+      "shortest_post": shortest_post,
+      "top_10_longest": sorted(stats["post_details"], key=lambda x: x["words"], reverse=True)[:10],
+      "top_10_shortest": sorted(stats["post_details"], key=lambda x: x["words"])[:10],
+    }
 
     ppt = {tag:stats["groups"]["per_tag"][tag]["posts"] for tag in stats["groups"]["per_tag"]}
     utils.to_xkcd(ppt, "%s/posts_per_tag.png" % (self.statsdir), "")
@@ -391,6 +521,9 @@ class Kalpi:
     calist = [x.replace(self.basedir, "") for x in utils.search_files_all("%s/static/images/clipart" % (self.basedir))]
     posts = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=False)
     self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
+
+    # build date for RSS
+    self.datadict["build_date"] = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
     total = len(posts)
     for idx, post in enumerate(posts):
       if idx == 0:
@@ -410,7 +543,7 @@ class Kalpi:
         post["next"]["url"] = posts[idx+1]["url"]
       filename = "%s%s" % (self.outputdir, post["url"])
       output = self.get_template("post.html", datadict={"metadata": self.datadict["metadata"], "post": post, "tags": self.datadict["tags"]})
-      output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<hr><h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<h5>', '<h5 class="h5 collapsible" onclick="toggle(this);">').replace('<h6>', '<h6 class="h6 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested active">').replace('<ol>', '<ol class="nested active">').replace('<p>', '<p class="nested active">').replace('<pre><code>', '<pre class="nested active"><code>').replace('<pre><code class="','<pre class="nested active"><code class="').replace('<p class="nested active"><a href="/posts/', '<p><a href="/posts/').replace('<p class="nested active">📅 published on ', '<p>📅 published on ').replace('<p class="nested active">🔖 tagged ', '<p>🔖 tagged ')
+      output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<h5>', '<h5 class="h5 collapsible" onclick="toggle(this);">').replace('<h6>', '<h6 class="h6 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested active">').replace('<ol>', '<ol class="nested active">').replace('<p>', '<p class="nested active">').replace('<pre><code>', '<pre class="nested active"><code>').replace('<pre><code class="','<pre class="nested active"><code class="').replace('<p class="nested active"><a href="/posts/', '<p><a href="/posts/').replace('<p class="nested active">published on ', '<p>published on ').replace('<p class="nested active">tagged ', '<p>tagged ')
       output = output.replace('](https://7h3ram.github.io/posts/', '](/posts/').replace('href="https://7h3ram.github.io/posts/', 'href="/posts/')
       #output = output.replace('BG_CLIPART_STYLE_HERE', 'class="bgclipart_sq" style="background-image: url(%s);"' % (random.choice(calist)))
       html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True) if "minify" in postprocess else output
@@ -437,6 +570,7 @@ class Kalpi:
     self.render_template("archive.html", postprocess=postprocess)
     self.render_template("tags.html", postprocess=postprocess)
     self.render_template("stats.html", postprocess=postprocess)
+    self.render_template("feed.xml", postprocess=[])
 
     utils.info("size: total:%s (%d), minified:%s (%d), delta:%s (%d)" % (
       utils.sizeof_fmt(self.totalsize),
