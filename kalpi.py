@@ -166,25 +166,25 @@ class Kalpi:
     for tag in tags:
       percent = (tags[tag]*100/maxtagcount)
       if percent <= 10:
-        tagcloud[tag] = "font-size:1.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[0])
+        tagcloud[tag] = "font-size:0.9em; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[0])
       elif percent <= 20:
-        tagcloud[tag] = "font-size:1.5em; font-weight:bold; color:%s; padding:20px 5px 20px 5px;" % (colors[1])
+        tagcloud[tag] = "font-size:1.1em; font-weight:bold; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[1])
       elif percent <= 30:
-        tagcloud[tag] = "font-size:2.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[2])
+        tagcloud[tag] = "font-size:1.3em; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[2])
       elif percent <= 40:
-        tagcloud[tag] = "font-size:2.5em; font-weight:bold; color:%s; padding:20px 5px 20px 5px;" % (colors[3])
+        tagcloud[tag] = "font-size:1.5em; font-weight:bold; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[3])
       elif percent <= 50:
-        tagcloud[tag] = "font-size:3.0em; color:%s; padding:20px 5px 20px 5px;" % (colors[4])
+        tagcloud[tag] = "font-size:1.7em; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[4])
       elif percent <= 60:
-        tagcloud[tag] = "font-size:3.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[5])
+        tagcloud[tag] = "font-size:1.9em; font-weight:bold; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[5])
       elif percent <= 70:
-        tagcloud[tag] = "font-size:4.0em; color:%s; padding:0px 5px 0px 5px;" % (colors[6])
+        tagcloud[tag] = "font-size:2.1em; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[6])
       elif percent <= 80:
-        tagcloud[tag] = "font-size:4.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[7])
+        tagcloud[tag] = "font-size:2.3em; font-weight:bold; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[7])
       elif percent <= 90:
-        tagcloud[tag] = "font-size:5.0em; color:%s; padding:0px 5px 0px 5px;" % (colors[8])
+        tagcloud[tag] = "font-size:2.5em; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[8])
       elif percent <= 100:
-        tagcloud[tag] = "font-size:5.5em; font-weight:bold; color:%s; padding:0px 5px 0px 5px;" % (colors[0])
+        tagcloud[tag] = "font-size:2.7em; font-weight:bold; color:%s; margin:0.1em 0.3em; line-height:2;" % (colors[0])
 
     keys = list(tagcloud.keys())
     random.shuffle(keys)
