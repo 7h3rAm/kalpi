@@ -16,6 +16,12 @@ import sparkline
 import prettytable
 from PIL import Image
 import matplotlib.pyplot as plt
+import logging
+import warnings
+
+# Suppress matplotlib font warnings
+logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
+warnings.filterwarnings('ignore', category=UserWarning, module='matplotlib')
 
 
 def highlight(text, color="black", bold=False):
@@ -212,7 +218,7 @@ def post_http(url, data={}, headers={}):
     return {}
 
 def strip_html(data):
-  return re.sub("\s+", " ", BeautifulSoup(data, "lxml").text)
+  return re.sub(r"\s+", " ", BeautifulSoup(data, "lxml").text)
 
 def datetimefilter(datestr, format='%Y/%m/%d %H:%M:%S'):
   try:

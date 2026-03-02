@@ -28,7 +28,7 @@ class Kalpi:
     self.datadict["recent_count"] = 10
     self.basedir = "%s/7h3rAm.github.io" % (utils.expand_env(var="$PROJECTSDIR"))
     self.outputdir = self.basedir
-    self.postsdir = "%s/_posts" % (self.basedir)
+    self.postsdir = "%s/samhita/blog/posts" % (utils.expand_env(var="$PROJECTSDIR"))
     self.templatesdir = "%s/_templates" % (self.basedir)
     self.statsdir = "%s/static/files/pages_stats" % (self.outputdir)
 
@@ -39,7 +39,7 @@ class Kalpi:
     self.pages["fitness"] = "%s/fitness.md" % (self.templatesdir)
 
     self.datadict["pages"] = {}
-    self.datadict["metadata"] = utils.load_yaml("%s/toolbox/bootstrap/self.yml" % (utils.expand_env(var="$HOME")))["metadata"]
+    self.datadict["metadata"] = utils.load_yaml("%s/bootstrap/self.yml" % (utils.expand_env(var="$HOME")))["metadata"]
     # Load CV YAML - handle multi-document format (---...---)
     with open("%s/cv/AnkurTyagi.yml" % (utils.expand_env(var="$PROJECTSDIR"))) as f:
       self.datadict["cv"] = list(yaml.safe_load_all(f))[0]
@@ -193,7 +193,7 @@ class Kalpi:
     return tagcloud
 
   def parse(self, lines):
-    date, summary, tags, content = None, None, None, None
+    date, summary, tags, status, content = None, None, None, None, None
     for idx, line in enumerate(lines):
       if line.startswith("date:"):
         date = time.strptime("".join(line.split(":")[1:]).strip(), self.postdateformat)
@@ -204,10 +204,12 @@ class Kalpi:
         tags = []
         for tag in "".join(line.split(":")[1:]).strip().split(", "):
           tags.append(tag.replace(" ", "_"))
+      if line.startswith("status:"):
+        status = line.split(":")[1].strip()
       if line == "\n":
         content = self.md2html("".join(lines[idx+1:]))
         break
-    return date, summary, tags, content
+    return date, summary, tags, status, content
 
   def reading_time_bar(self, minutes, maxsize=10):
     """Generate a Unicode block bar for reading time"""
@@ -251,7 +253,9 @@ class Kalpi:
         with open(path, "r") as f:
           title = f.readline()[:-1].strip("\n..").rstrip(":")
           contentmd = self.preprocess_text(f.readlines())
-          date, summary, tags, content = self.parse(contentmd)
+          date, summary, tags, status, content = self.parse(contentmd)
+          if status and status != "public":
+            continue
           year, month, day = date[:3]
           pretty_date = time.strftime(self.postdateformat, date)
           epoch = time.mktime(date)
@@ -920,10 +924,11 @@ class Kalpi:
       utils.warn(f"Error updating CV data: {e}")
 
   def make(self, args, postprocess=[]):
-    # Update CV data with latest stats before building
-    self.update_cv_data()
+    if not args.fast:
+      # Update CV data with latest stats before building
+      self.update_cv_data()
 
-    # Reload CV data after update
+    # Reload CV data after update (uses cached yaml if --fast)
     with open("%s/cv/AnkurTyagi.yml" % (utils.expand_env(var="$PROJECTSDIR"))) as f:
       self.datadict["cv"] = list(yaml.safe_load_all(f))[0]
 
@@ -980,7 +985,7 @@ class Kalpi:
     self.render_template("research.html", postprocess=postprocess)
 
     # Fetch satellite data before rendering satview
-    self.datadict["dscovr_epic_images"] = self.fetch_dscovr_epic_images(count=4)
+    self.datadict["dscovr_epic_images"] = [] if args.fast else self.fetch_dscovr_epic_images(count=4)
     self.render_template("satview.html", postprocess=postprocess)
     self.render_template("startpage.html", postprocess=postprocess)
 
@@ -1004,6 +1009,7 @@ class Kalpi:
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description="%s (v%s)" % (utils.blue_bold("kalpi"), utils.green_bold("0.1")))
+  parser.add_argument("--fast", action="store_true", help="skip network data collection (cv stats, satellite images)")
   args = parser.parse_args()
 
   klp = Kalpi()
