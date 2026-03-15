@@ -2,7 +2,9 @@
 
 import os
 import re
+import glob
 import time
+import shutil
 import random
 import hashlib
 import htmlmin
@@ -29,6 +31,7 @@ class Kalpi:
     self.basedir = "%s/7h3rAm.github.io" % (utils.expand_env(var="$PROJECTSDIR"))
     self.outputdir = self.basedir
     self.postsdir = "%s/samhita/blog/posts" % (utils.expand_env(var="$PROJECTSDIR"))
+    self.draftsdir = "%s/samhita/blog/drafts" % (utils.expand_env(var="$PROJECTSDIR"))
     self.templatesdir = "%s/_templates" % (self.basedir)
     self.statsdir = "%s/static/files/pages_stats" % (self.outputdir)
 
@@ -242,7 +245,7 @@ class Kalpi:
       sparkcoloredlong = "".join(['<span style="color:%s;">%s</span>' % (random.choice(colors), random.choice(chars)) for _ in range(len(sparkid))])
     return ('<span class="sparklines" title="%s">%s</span>' % (sparkid, sparkcolored), '<span class="sparklines" title="%s">%s</span>' % (sparkid, sparkcoloredlong))
 
-  def get_tree(self, source):
+  def get_tree(self, source, include_drafts=False):
     posts = []
     self.datadict["tags"] = dict()
     for root, ds, fs in os.walk(source):
@@ -254,7 +257,8 @@ class Kalpi:
           title = f.readline()[:-1].strip("\n..").rstrip(":")
           contentmd = self.preprocess_text(f.readlines())
           date, summary, tags, status, content = self.parse(contentmd)
-          if status and status != "public":
+          is_draft = status != "public"
+          if not include_drafts and is_draft:
             continue
           year, month, day = date[:3]
           pretty_date = time.strftime(self.postdateformat, date)
@@ -296,6 +300,7 @@ class Kalpi:
             "rss_date": rss_date,
             "previous": None,
             "next": None,
+            "is_draft": is_draft,
           }
           posts.append(post)
           for tag in tags:
@@ -923,6 +928,140 @@ class Kalpi:
     except Exception as e:
       utils.warn(f"Error updating CV data: {e}")
 
+  def publish(self, draft_name):
+    """move a draft to posts, copy assets, rewrite image paths"""
+    stem = os.path.splitext(draft_name)[0]
+    draft_path = os.path.join(self.draftsdir, draft_name)
+    post_path = os.path.join(self.postsdir, draft_name)
+    draft_assets = os.path.join(self.draftsdir, "assets", stem)
+    post_assets = os.path.join(self.outputdir, "static", "files", "posts_%s" % stem.replace("-", "_"))
+
+    if not os.path.isfile(draft_path):
+      utils.warn("draft not found: %s" % draft_path)
+      return False
+
+    if os.path.isfile(post_path):
+      utils.warn("post already exists: %s" % post_path)
+      return False
+
+    # read and rewrite
+    with open(draft_path, "r") as f:
+      content = f.read()
+
+    # change status: draft -> status: public
+    content = re.sub(r'^status:\s*draft', 'status: public', content, count=1, flags=re.MULTILINE)
+
+    # rewrite image paths: drafts/assets/<stem>/ -> /static/files/posts_<stem>/
+    asset_prefix_draft = "drafts/assets/%s/" % stem
+    asset_prefix_pub = "/static/files/posts_%s/" % stem.replace("-", "_")
+    content = content.replace(asset_prefix_draft, asset_prefix_pub)
+
+    # write to posts dir
+    with open(post_path, "w") as f:
+      f.write(content)
+
+    # copy assets
+    if os.path.isdir(draft_assets):
+      os.makedirs(post_assets, exist_ok=True)
+      for src in glob.glob(os.path.join(draft_assets, "*")):
+        dst = os.path.join(post_assets, os.path.basename(src))
+        shutil.copy2(src, dst)
+      utils.info("assets: copied %d files to %s" % (
+        len(glob.glob(os.path.join(draft_assets, "*"))), post_assets))
+
+    # remove draft
+    os.remove(draft_path)
+    utils.info("published: %s -> %s" % (draft_name, post_path))
+    return True
+
+  def unpublish(self, post_name):
+    """move a post back to drafts, restore asset paths"""
+    stem = os.path.splitext(post_name)[0]
+    post_path = os.path.join(self.postsdir, post_name)
+    draft_path = os.path.join(self.draftsdir, post_name)
+
+    if not os.path.isfile(post_path):
+      utils.warn("post not found: %s" % post_path)
+      return False
+
+    if os.path.isfile(draft_path):
+      utils.warn("draft already exists: %s" % draft_path)
+      return False
+
+    # read and rewrite
+    with open(post_path, "r") as f:
+      content = f.read()
+
+    # change status: public -> status: draft
+    content = re.sub(r'^status:\s*public', 'status: draft', content, count=1, flags=re.MULTILINE)
+
+    # rewrite image paths back: /static/files/posts_<stem>/ -> drafts/assets/<stem>/
+    asset_prefix_pub = "/static/files/posts_%s/" % stem.replace("-", "_")
+    asset_prefix_draft = "drafts/assets/%s/" % stem
+    content = content.replace(asset_prefix_pub, asset_prefix_draft)
+
+    # write to drafts dir
+    with open(draft_path, "w") as f:
+      f.write(content)
+
+    # remove post (assets stay in static/files for now, no harm)
+    os.remove(post_path)
+    utils.info("unpublished: %s -> %s" % (post_name, draft_path))
+    return True
+
+  def process_tabs(self, html):
+    """Replace tab comment markers with tab group HTML."""
+    group_re = re.compile(
+      r'<!--\s*tabs\s+(.*?)-->(.*?)<!--\s*/tabs\s*-->',
+      re.DOTALL
+    )
+    tab_re = re.compile(r'<!--\s*tab\s+label="([^"]+)"\s*-->')
+    attr_re = re.compile(r'(\w+)="([^"]+)"')
+
+    def build_group(match):
+      attrs = dict(attr_re.findall(match.group(1)))
+      group = attrs.get("group", "tabs")
+      layout = attrs.get("layout", "tabs")
+      body = match.group(2)
+
+      parts = tab_re.split(body)
+      # parts[0] is before first tab (discard), then alternating label, content
+      labels = parts[1::2]
+      panels = parts[2::2]
+
+      is_sidebyside = layout == "side-by-side"
+      cls = "tab-group-sidebyside" if is_sidebyside else "tab-group-standard"
+
+      if is_sidebyside:
+        # Side-by-side: all panels visible, no radio inputs needed
+        items = []
+        for idx, (label, content) in enumerate(zip(labels, panels)):
+          items.append(
+            '<div class="sbs-cell"><div class="sbs-label">%s</div>%s</div>'
+            % (label, content.strip())
+          )
+        out = '<div class="tab-group-sidebyside">'
+        out += "".join(items)
+        out += '</div>'
+      else:
+        # Pure CSS tabs: radio input + label + panel as siblings
+        items = []
+        for idx, (label, content) in enumerate(zip(labels, panels)):
+          tab_id = "%s-%d" % (group, idx)
+          checked = " checked" if idx == 0 else ""
+          items.append(
+            '<input type="radio" name="%s" id="%s"%s>'
+            '<label for="%s">%s</label>'
+            '<div class="tab-panel">%s</div>'
+            % (group, tab_id, checked, tab_id, label, content.strip())
+          )
+        out = '<div class="tab-group tab-group-standard">'
+        out += "".join(items)
+        out += '</div>'
+      return out
+
+    return group_re.sub(build_group, html)
+
   def make(self, args, postprocess=[]):
     if not args.fast:
       # Update CV data with latest stats before building
@@ -934,7 +1073,11 @@ class Kalpi:
 
     # posts
     calist = [x.replace(self.basedir, "") for x in utils.search_files_all("%s/static/images/clipart" % (self.basedir))]
-    posts = sorted(self.get_tree(self.postsdir), key=lambda post: post["epoch"], reverse=False)
+    self.include_drafts = getattr(args, "drafts", False)
+    posts = sorted(self.get_tree(self.postsdir, include_drafts=self.include_drafts), key=lambda post: post["epoch"], reverse=False)
+    if self.include_drafts:
+      drafts = self.get_tree(self.draftsdir, include_drafts=True)
+      posts = sorted(posts + drafts, key=lambda post: post["epoch"], reverse=False)
     self.datadict["posts"] = sorted(posts, key=lambda post: post["epoch"], reverse=True)
 
     # build date for RSS
@@ -961,6 +1104,7 @@ class Kalpi:
       output = output.replace('<h1>', '<h1 class="h1 collapsible" onclick="toggle(this);">').replace('<h2>', '<h2 class="h2 collapsible" onclick="toggle(this);">').replace('<h3>', '<h3 class="h3 collapsible" onclick="toggle(this);">').replace('<h4>', '<h4 class="h4 collapsible" onclick="toggle(this);">').replace('<h5>', '<h5 class="h5 collapsible" onclick="toggle(this);">').replace('<h6>', '<h6 class="h6 collapsible" onclick="toggle(this);">').replace('<ul>', '<ul class="nested active">').replace('<ol>', '<ol class="nested active">').replace('<p>', '<p class="nested active">').replace('<pre><code>', '<pre class="nested active"><code>').replace('<pre><code class="','<pre class="nested active"><code class="').replace('<p class="nested active"><a href="/posts/', '<p><a href="/posts/').replace('<p class="nested active">published on ', '<p>published on ').replace('<p class="nested active">tagged ', '<p>tagged ')
       output = output.replace('](https://7h3ram.github.io/posts/', '](/posts/').replace('href="https://7h3ram.github.io/posts/', 'href="/posts/')
       #output = output.replace('BG_CLIPART_STYLE_HERE', 'class="bgclipart_sq" style="background-image: url(%s);"' % (random.choice(calist)))
+      output = self.process_tabs(output)
       html = htmlmin.minify(output, remove_comments=True, remove_empty_space=True) if "minify" in postprocess else output
       utils.file_save(filename, html)
       #utils.info("rendered '%s' (%s)" % (utils.magenta(filename), utils.blue(utils.sizeof_fmt(len(html)))))
@@ -1010,7 +1154,15 @@ class Kalpi:
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description="%s (v%s)" % (utils.blue_bold("kalpi"), utils.green_bold("0.1")))
   parser.add_argument("--fast", action="store_true", help="skip network data collection (cv stats, satellite images)")
+  parser.add_argument("--drafts", action="store_true", help="include draft posts in build for preview")
+  parser.add_argument("--publish", metavar="FILE", help="publish a draft (e.g. fparse.md)")
+  parser.add_argument("--unpublish", metavar="FILE", help="unpublish a post back to draft")
   args = parser.parse_args()
 
   klp = Kalpi()
-  klp.make(args)
+  if args.publish:
+    klp.publish(args.publish)
+  elif args.unpublish:
+    klp.unpublish(args.unpublish)
+  else:
+    klp.make(args)
